@@ -1,0 +1,77 @@
+body {
+    font-size: 16px;
+}
+
+.topBar {
+    height: 70px;
+    width: 100%;
+    background-color: rgb(189, 166, 166);
+    border-bottom: 1px solid grey;
+}
+
+.mainFrame {
+    width: 100%;
+    height: 600px;
+    position: relative;
+    display: flex;
+}
+
+.leftArea {
+    width: 220px;
+    height: 100%;
+    background-color: rgb(236, 223, 223);
+    flex: none;
+    position: relative;
+    border-right: 1px solid grey;
+
+}
+
+.middleArea {
+    width: 220px;
+    height: 100%;
+    background-color: rgb(231, 185, 185);
+    flex: none;
+    position: relative;
+    border-right: 1px solid grey;
+
+}
+
+.rightArea {
+    height: 100%;
+    background-color: rgb(235, 225, 140);
+    position: relative;
+    flex: 1;
+}
+
+.addItem {
+    position: relative;
+    height: 40px;
+    /* line-height: 40px; */
+    width: 100%;
+    border-top: 1px solid grey;
+    background-color: rgb(207, 197, 197);
+    margin-bottom: 0;
+}
+
+.rightTitleBar {
+    height: 50px;
+    background-color: rgb(207, 197, 197);
+    border-bottom: 1px solid grey;
+    font-size: 24px;
+    line-height: 50px;
+    padding-left: 15px;
+    font-weight: bold;
+}
+
+.rightTimeBar {
+    height: 40px;
+    background-color: rgb(207, 197, 197);
+    border-bottom: 1px solid grey;
+    line-height: 40px;
+    padding-left: 15px;
+}
+
+.content {
+    padding: 15px;
+    line-height: 130%;
+}
