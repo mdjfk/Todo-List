@@ -1,0 +1,5 @@
+var todo = {
+    init: function () {
+
+    }
+};
