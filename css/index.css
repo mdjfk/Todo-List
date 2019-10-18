@@ -44,13 +44,17 @@ body {
 }
 
 .addItem {
-    position: relative;
+    position: absolute;
     height: 40px;
-    /* line-height: 40px; */
     width: 100%;
+    padding: 0 20px;
+    font-size: 16px;
+    line-height: 40px;
+    width: 100%;
+    bottom: 0;
     border-top: 1px solid grey;
     background-color: rgb(207, 197, 197);
-    margin-bottom: 0;
+    cursor: pointer;
 }
 
 .rightTitleBar {
@@ -66,7 +70,7 @@ body {
 .rightTimeBar {
     height: 40px;
     background-color: rgb(207, 197, 197);
-    border-bottom: 1px solid grey;
+    /* border-bottom: 1px solid grey; */
     line-height: 40px;
     padding-left: 15px;
 }
@@ -74,4 +78,25 @@ body {
 .content {
     padding: 15px;
     line-height: 130%;
+}
+
+.leftItem {
+    padding: 12px 15px;
+}
+
+.category {
+    /* width: 94%; */
+}
+
+.statusBtn {
+    position: absolute;
+    height: 40px;
+    width: 100%;
+    padding: 0 20px;
+    font-size: 16px;
+    line-height: 40px;
+    width: 100%;
+    top: 0;
+    background-color: rgb(207, 197, 197);
+    border-bottom: 1px solid grey;
 }
