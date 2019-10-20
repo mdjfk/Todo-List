@@ -15,28 +15,31 @@
         </div>
         <div class="mainFrame">
             <div class="leftArea">
-                <div class="leftItem">
-                    <div style="height: 30px;">
-                        所有任务（0）
+                <div class="leftItem" id="leftItem">
+                    <div class="leftTop">
+                        所有任务（<span id="assignNum">0</span>）
                     </div>
-                    <div style="height: 30px;">
+                    <div class="leftTop">
                         分类列表
                     </div>
-                    <div class="category">
-                        <span class="glyphicon glyphicon-folder-close"></span>&nbsp; 默认分类 （0）
+                    <div class="category defaultCat">
+                        <span class="glyphicon glyphicon-folder-close"></span>&nbsp; 默认分类 （<span
+                            class="assignNum">0</span>）
                     </div>
                 </div>
-                <div class="addItem">
+                <div class="addItem" id="addCat">
                     <span class="glyphicon glyphicon-plus"></span>&nbsp; 新增分类
                 </div>
             </div>
             <div class="middleArea">
                 <div class="statusBtn">
-
+                    <div class="fliter">所有</div>
+                    <div class="fliter">未完成</div>
+                    <div class="fliter">已完成</div>
                 </div>
                 <div class="middleItem"></div>
 
-                <div class="addItem">
+                <div class="addItem" id="addAssign">
                     <span class="glyphicon glyphicon-plus"></span>&nbsp; 新增任务
 
                 </div>
@@ -50,8 +53,31 @@
 
         </div>
     </div>
+    <div class="popWindow">
+        <div id="popTitle">新增分类</div>
+        <div>
+            选择一个分类：
+            <select name="category" id="subCat" style="width: 180px;height: 25px;">
+                <option value="new" selected>新建分类</option>
+                <option value="default">默认分类</option>
+            </select>
+        </div>
+        <div>
+            新增分类名称：
+            <input type="text" name="newCatName" style="width: 180px;height: 25px;">
+        </div>
+        <div>
+            <button style="width: 80px;margin: 16px;" id="btnConfirm">Confirm</button>
+            <button style="width: 80px;margin: 16px;" id="btnCancel">Cancel</button>
+        </div>
 
+    </div>
     <script src="js/index.js"></script>
+    <script>
+        window.onload = function () {
+            todo.init();
+        };
+    </script>
 </body>
 
 </html>

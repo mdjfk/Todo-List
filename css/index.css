@@ -11,13 +11,14 @@ body {
 
 .mainFrame {
     width: 100%;
-    height: 600px;
-    position: relative;
+    position: absolute;
     display: flex;
+    top: 70px;
+    bottom: 0;
 }
 
 .leftArea {
-    width: 220px;
+    width: 260px;
     height: 100%;
     background-color: rgb(236, 223, 223);
     flex: none;
@@ -27,7 +28,7 @@ body {
 }
 
 .middleArea {
-    width: 220px;
+    width: 260px;
     height: 100%;
     background-color: rgb(231, 185, 185);
     flex: none;
@@ -78,14 +79,20 @@ body {
 .content {
     padding: 15px;
     line-height: 130%;
+    border-top: 1px solid grey;
 }
 
 .leftItem {
-    padding: 12px 15px;
+    padding: 12px 0;
 }
 
 .category {
-    /* width: 94%; */
+    padding: 8px 15px;
+    cursor: pointer;
+}
+
+.category:hover {
+    background-color: #fff;
 }
 
 .statusBtn {
@@ -99,4 +106,53 @@ body {
     top: 0;
     background-color: rgb(207, 197, 197);
     border-bottom: 1px solid grey;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.fliter {
+    height: 30px;
+    padding: 0 8px;
+    margin: 0 3px;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 28px;
+    border: 1px solid transparent;
+
+}
+
+.fliter:hover {
+    border: 1px solid grey;
+    border-radius: 8px;
+    background-color: rgb(236, 228, 228);
+}
+
+.leftTop {
+    padding: 6px 15px;
+}
+
+.popWindow {
+    position: absolute;
+    width: 330px;
+    height: 180px;
+    background-color: rgb(193, 237, 240);
+    border: 1px solid brown;
+    border-radius: 15px;
+    left: 50%;
+    top: 50%;
+    margin-top: -100px;
+    margin-left: -165px;
+    display: none;
+}
+
+.popWindow div {
+    width: 100%;
+    margin: 5px auto;
+    text-align: center;
+}
+
+#popTitle {
+    height: 45px;
+    font-size: 20px;
 }
