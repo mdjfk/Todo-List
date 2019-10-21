@@ -22,9 +22,14 @@
                     <div class="leftTop">
                         分类列表
                     </div>
-                    <div class="category defaultCat">
-                        <span class="glyphicon glyphicon-folder-close"></span>&nbsp; 默认分类 （<span
-                            class="assignNum">0</span>）
+                    <div class="category defaultCat" data-category="默认分类">
+                        <div class="mainCat">
+                            <span class="glyphicon glyphicon-folder-close"></span>&nbsp; 默认分类 （<span
+                                class="assignNum">0</span>）
+                        </div>
+                        <div class="subCat">
+                            <span class="glyphicon glyphicon-file"></span>&nbsp; 说明 （<span class="assignNum">0</span>）
+                        </div>
                     </div>
                 </div>
                 <div class="addItem" id="addCat">
@@ -58,13 +63,13 @@
         <div>
             选择一个分类：
             <select name="category" id="subCat" style="width: 180px;height: 25px;">
-                <option value="new" selected>新建分类</option>
-                <option value="default">默认分类</option>
+                <option value="newCategory" selected>新建分类</option>
+                <option value="默认分类">默认分类</option>
             </select>
         </div>
         <div>
             新增分类名称：
-            <input type="text" name="newCatName" style="width: 180px;height: 25px;">
+            <input type="text" name="newCatName" style="width: 180px;height: 25px;" id="addName">
         </div>
         <div>
             <button style="width: 80px;margin: 16px;" id="btnConfirm">Confirm</button>

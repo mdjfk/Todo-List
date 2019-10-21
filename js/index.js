@@ -1,25 +1,45 @@
 var todo = {
     init: function () {
         var self = this;
-        // self.getById("addCat").addEventListener("click", function () {
-        //     var catName = prompt("请输入分类的名称", "新建分类");
-        //     if (catName) {
-        //         var cat = new Category(catName, 0);
-        //         cat.addCat();
-        //     }
 
-        // });
         self.getByClass("addItem")[0].addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "inline";
         });
         self.getById("btnCancel").addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "none";
+            self.getById("addName").value = "";
         });
         self.getById("btnConfirm").addEventListener("click", function () {
             var select = self.getById("subCat"),
-                selectValue = select.options[select.selectedIndex].value;
-            alert(selectValue);
-            self.getByClass("popWindow")[0].style.display = "none";
+                selectValue = select.options[select.selectedIndex].value,
+                newName = self.getById("addName").value;
+            if (newName) {
+                alert(selectValue);
+                if (selectValue === "newCategory") {
+                    //新建主分类
+                    var cat = new Category(newName, 0);
+                    cat.addCat();
+                } else {
+                    //新建子分类
+                    var nodes = self.getByClass("category"),
+                        len = nodes.length;
+                    for (let i = 0; i < len; i++) {
+                        var a = nodes[i].getAttribute("data-category");
+                        alert(a);
+                        if (a === selectValue) {
+                            var subCat = new Category(newName, 0);
+                            subCat.addSub(nodes[i]);
+                        }
+
+                    }
+                }
+                self.getByClass("popWindow")[0].style.display = "none";
+                self.getById("addName").value = "";
+            } else {
+                alert("Please input a name for the new category!");
+            }
+            // alert(selectValue);
+
         });
         var Category = function (name, num) {
             this.name = name;
@@ -27,42 +47,20 @@ var todo = {
         };
         Category.prototype = {
             /* add sub assign */
-            addSub: function (name, date) {
+            addSub: function (node) {
 
-            },
-            /** delete sub assign */
-            deleteSub: function () {
-
+                // <div class="subCat">
+                //     <span class="glyphicon glyphicon-file"></span>&nbsp; 说明 （<span class="assignNum">0</span>）
+                //         </div>
+                node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
             },
             /** add new category  */
             addCat: function () {
-                // var node = self.createElement("div", "category");
-                // var subNode1 = self.createElement("span", "glyphicon", "glyphicon-folder-close");
-                // node.appendChild(subNode1);
-                // node.innerHTML += "&nbsp;" + " " + this.name + " （";
-                // node.appendChild
+                self.getById("leftItem").innerHTML += "<div class='category' data-category='" + this.name + "'><div class='mainCat'><span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div></div>";
 
-                // var textNode1 = self.createTextNode("&amp;nbsp; " + this.name + " （");
-                // var textNode2 = self.createTextNode("）");
-                // var subNode2 = self.createElement("span", "assignNum");
-                // subNode2.innerHTML = this.num;
-                // self.appendChildren(node, subNode1, textNode1, subNode2, textNode2);
-
-                document.getElementById("leftItem").innerHTML += "<div class='category'><span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='defaultAssignNum'>" + this.num + "</span>）</div>";
-                // document.getElementById("leftItem").appendChild(node);
-            },
-            /** delete category  */
-            deleteCat: function () {
-
-            },
-            /** show category chosen style */
-            chosen: function () {
-
-            },
-            /** show category unchosen style */
-            unchosen: function () {
-
+                // self.getById("leftItem").innerHTML += "<div class='category'><span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
             }
+
         };
         // getByClass("category")
     },

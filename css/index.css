@@ -86,12 +86,23 @@ body {
     padding: 12px 0;
 }
 
-.category {
+/* .category {
     padding: 8px 15px;
+    cursor: pointer;
+} */
+
+.mainCat {
+    padding: 5px 15px;
     cursor: pointer;
 }
 
-.category:hover {
+.subCat {
+    padding: 5px 35px;
+    cursor: pointer;
+}
+
+.mainCat:hover,
+.subCat:hover {
     background-color: #fff;
 }
 
