@@ -97,8 +97,14 @@ body {
 }
 
 .subCat {
-    padding: 5px 35px;
+    padding: 5px 15px 5px 35px;
     cursor: pointer;
+}
+
+.trashIcon {
+    float: right;
+    top: 3px;
+    display: none;
 }
 
 .mainCat:hover,
