@@ -1,15 +1,18 @@
 var todo = {
+    chosenSubitle: -1,
     init: function () {
         var self = this;
 
         self.getByClass("addItem")[0].addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "inline";
         }, false);
+        //弹窗 取消按钮
         self.getById("btnCancel").addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "none";
             self.getById("addName").value = "";
             self.getById("subCat").options[0].selected = true;
         }, false);
+        //弹窗 确认按钮
         self.getById("btnConfirm").addEventListener("click", function () {
             var select = self.getById("subCat"),
                 selectValue = select.options[select.selectedIndex].value,
@@ -40,33 +43,28 @@ var todo = {
             }
 
         }, false);
-        self.classAddListener("mainCat", "mouseenter", function (e) {
+        //显示及隐藏删除图标
+        var toggleShow = function (e) {
             var tar = e.target.getElementsByClassName("trashIcon");
             if (tar.length) {
-                tar[0].style.display = "inline";
+                tar[0].classList.toggle("hide");
+
             }
-        });
-        self.classAddListener("mainCat", "mouseleave", function (e) {
-            var tar = e.target.getElementsByClassName("trashIcon");
-            if (tar.length) {
-                tar[0].style.display = "none";
-            }
-        });
-        self.classAddListener("subCat", "mouseenter", function (e) {
-            var tar = e.target.getElementsByClassName("trashIcon");
-            if (tar.length) {
-                tar[0].style.display = "inline";
-            }
-        });
-        self.classAddListener("subCat", "mouseleave", function (e) {
-            var tar = e.target.getElementsByClassName("trashIcon");
-            if (tar.length) {
-                tar[0].style.display = "none";
-            }
+        };
+        self.classAddListener("mainCat", "mouseenter", toggleShow);
+        self.classAddListener("mainCat", "mouseleave", toggleShow);
+        self.classAddListener("subCat", "mouseenter", toggleShow);
+        self.classAddListener("subCat", "mouseleave", toggleShow);
+        //选中子分类样式
+        self.classAddListener("subCat", "click", function (e) {
+            self.traverseClassNode("subCat", function (x) {
+                x.classList.remove("chosen");
+            });
+            e.target.classList.add("chosen");
         });
         self.classAddListener("inSubCat", "click", function (e) {
             var tar = e.target.parentNode;
-            if (tar.className.indexOf("subCat") >-1) {
+            if (tar.className.indexOf("subCat") > -1) {
                 // tar.
             }
         });
@@ -106,5 +104,16 @@ var todo = {
                 classes[i].addEventListener(eventType, func, false);
             }
         }
+    },
+    traverseClassNode: function (cls, func) {
+        var self = this,
+            nodeList = self.getByClass(cls),
+            len = nodeList.length;
+        if (typeof func === "function") {
+            for (let i = 0; i < len; i++) {
+                func(nodeList[i]);
+            }
+        }
+
     }
 };

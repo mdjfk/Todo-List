@@ -90,10 +90,12 @@ body {
     padding: 8px 15px;
     cursor: pointer;
 } */
+.glyphicon {
+    cursor: pointer;
+}
 
 .mainCat {
     padding: 5px 15px;
-    cursor: pointer;
 }
 
 .subCat {
@@ -104,7 +106,7 @@ body {
 .trashIcon {
     float: right;
     top: 3px;
-    display: none;
+    /* display: none; */
 }
 
 .mainCat:hover,
@@ -172,4 +174,20 @@ body {
 #popTitle {
     height: 45px;
     font-size: 20px;
+}
+
+.show {
+    display: inline;
+}
+
+.hide {
+    display: none;
+}
+
+.chosen {
+    background-color: #fff;
+}
+
+.unchosen {
+    background-color: transparent;
 }
