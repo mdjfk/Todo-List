@@ -66,6 +66,7 @@ body {
     line-height: 50px;
     padding-left: 15px;
     font-weight: bold;
+    display: flex;
 }
 
 .rightTimeBar {
@@ -74,12 +75,15 @@ body {
     /* border-bottom: 1px solid grey; */
     line-height: 40px;
     padding-left: 15px;
+    position: relative;
 }
 
 .content {
     padding: 15px;
     line-height: 130%;
     border-top: 1px solid grey;
+    width: 100%;
+    position: relative;
 }
 
 .leftItem {
@@ -190,4 +194,35 @@ body {
 
 .unchosen {
     background-color: transparent;
+}
+
+#titleIcon {
+    width: 45px;
+    height: 45px;
+    font-size: 26px;
+    /* float: right; */
+    flex: none;
+}
+
+.inputTitle {
+    height: 38px;
+    width: 60px;
+    font-size: 22px;
+    font-weight: 400;
+    width: 100%;
+    background-color: transparent;
+
+}
+
+.inputContent {
+    height: 100%;
+    /* width: 60px; */
+    font-size: 20px;
+    width: 100%;
+}
+
+#assignTitle {
+    margin-right: 30px;
+    display: relative;
+    flex: 1;
 }

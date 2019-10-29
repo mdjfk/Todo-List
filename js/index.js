@@ -62,12 +62,17 @@ var todo = {
             });
             e.target.classList.add("chosen");
         });
-        self.classAddListener("inSubCat", "click", function (e) {
-            var tar = e.target.parentNode;
-            if (tar.className.indexOf("subCat") > -1) {
-                // tar.
-            }
-        });
+        //新增任务
+        self.getById("addAssign").addEventListener("click", function () {
+            self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
+            self.getByClass("content")[0].innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
+            self.getByClass("glyphicon-plus")[0].addEventListener("click", function () {
+                self.getById("assignTitle").innerHTML = self.getById("assTitle").value;
+                self.getByClass("content")[0].innerHTML = self.getById("assContent").value;
+            }, false);
+        }, false);
+        //完成编辑
+
         var Category = function (name, num) {
             this.name = name;
             this.num = num;
