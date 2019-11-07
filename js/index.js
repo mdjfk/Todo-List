@@ -60,19 +60,47 @@ var todo = {
             self.traverseClassNode("subCat", function (x) {
                 x.classList.remove("chosen");
             });
+            self.chosenSubitle = e.target.getAttribute("data-index")
             e.target.classList.add("chosen");
         });
         //新增任务
         self.getById("addAssign").addEventListener("click", function () {
-            self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
-            self.getByClass("content")[0].innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
-            self.getByClass("glyphicon-plus")[0].addEventListener("click", function () {
-                self.getById("assignTitle").innerHTML = self.getById("assTitle").value;
-                self.getByClass("content")[0].innerHTML = self.getById("assContent").value;
-            }, false);
+            //if 选中分类
+            if (self.chosenSubitle > -1) {
+                self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
+                self.getByClass("content")[0].innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
+                self.getById("inputeDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
+            } else {
+                alert('Choose a subCategory before adding a assignment');
+            }
+
         }, false);
         //完成编辑
+        self.getByClass("glyphicon-ok")[0].addEventListener("click", function () {
+            var date = self.getById("deadline").value,
+                title = self.getById("assTitle").value;
+            if (self.getById("assTitle").value && date) { //任务标题与deadline不为空
+                self.getById("assignTitle").innerHTML = title;
+                self.getById("inputeDate").innerHTML = date;
+                self.getByClass("content")[0].innerHTML = self.getById("assContent").value;
+                //任务新增在任务栏中
+                for (var subDiv = self.getByClass("middleItem")[0].firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
+                    if (subDiv.getAttribute("data-duedate") === date) {
+                        break;
+                    };
 
+                }
+                if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
+                    subDiv.innerHTML += "<div class='titleGroup'>" + title + "</div>";
+                } else { //新增日期与任务
+                    self.getByClass("middleItem")[0].innerHTML += "<div data-duedate=" + date + "> <div class ='dateGroup'>" + date + "</div> <div class ='titleGroup'>" + title + "</div></div>";
+                }
+
+            } else {
+                alert("Title and due date is a must!");
+            }
+
+        }, false);
         var Category = function (name, num) {
             this.name = name;
             this.num = num;

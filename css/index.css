@@ -226,3 +226,31 @@ body {
     display: relative;
     flex: 1;
 }
+
+#deadline {
+    background-color: transparent;
+    border: none;
+    height: 35px;
+
+}
+
+.middleItem {
+    margin-top: 40px;
+}
+
+.dateGroup {
+    height: 36px;
+    line-height: 36px;
+    padding: 0 0 0 20px;
+    /* color: brown; */
+    background-color: rgb(228, 205, 205);
+}
+
+.titleGroup {
+    height: 34px;
+    line-height: 34px;
+    padding: 0 0 0 20px;
+    color: rgb(110, 29, 29);
+    background-color: rgb(255, 241, 241);
+    cursor: pointer;
+}

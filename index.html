@@ -29,10 +29,10 @@
                                 class="assignNum">0</span>）<span
                                 class="glyphicon glyphicon-trash trashIcon inMainCat hide"></span>
                         </div>
-                        <div class="subCat" data-index="">
+                        <div class="subCat" data-index="0">
                             <span class="glyphicon glyphicon-file"></span>&nbsp; 说明 （<span class="assignNum">0</span>）
                         </div>
-                        <div class="subCat" data-index="">
+                        <div class="subCat" data-index="1">
                             <span class="glyphicon glyphicon-file"></span>&nbsp; 说明 （<span
                                 class="assignNum">0</span>）<span
                                 class="glyphicon glyphicon-trash trashIcon inSubCat hide"></span>
@@ -49,7 +49,24 @@
                     <div class="fliter">未完成</div>
                     <div class="fliter">已完成</div>
                 </div>
-                <div class="middleItem"></div>
+                <div class="middleItem">
+                    <div data-duedate="2019-11-12">
+                        <div class="dateGroup">
+                            2019-11-12
+                        </div>
+                        <div class="titleGroup">
+                            title2
+                        </div>
+                    </div>
+                    <div data-duedate="2019-11-12">
+                        <div class="dateGroup">
+                            2019-11-12
+                        </div>
+                        <div class="titleGroup">
+                            title2
+                        </div>
+                    </div>
+                </div>
 
                 <div class="addItem" id="addAssign">
                     <span class="glyphicon glyphicon-plus"></span>&nbsp; 新增任务
@@ -65,7 +82,10 @@
                         <span class="glyphicon glyphicon-ok"></span>
                     </div>
                 </div>
-                <div class="rightTimeBar"><span>Due date: </span>2019-10-13</div>
+                <div class="rightTimeBar">
+                    <span>Due date: </span>
+                    <span id="inputeDate"></span>
+                </div>
                 <div class="content">
                     正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分</div>
             </div>
