@@ -108,7 +108,20 @@ var todo = {
         Category.prototype = {
             /* add sub assign */
             addSub: function (node) {
-                node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
+                var div = document.createElement("DIV");
+                div.classList.add("subCat");
+                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）";
+                node.appendChild(div);
+                // node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
+                // console.log();
+                div.addEventListener("click", function (e) {
+                    todo.traverseClassNode("subCat", function (x) {
+                        x.classList.remove("chosen");
+                    });
+                    todo.chosenSubitle = e.currentTarget.getAttribute("data-index");
+                    e.currentTarget.classList.add("chosen");
+                }, false);
+
             },
             /** add new category  */
             addCat: function () {
