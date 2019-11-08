@@ -60,8 +60,8 @@ var todo = {
             self.traverseClassNode("subCat", function (x) {
                 x.classList.remove("chosen");
             });
-            self.chosenSubitle = e.target.getAttribute("data-index")
-            e.target.classList.add("chosen");
+            self.chosenSubitle = e.currentTarget.getAttribute("data-index");
+            e.currentTarget.classList.add("chosen");
         });
         //新增任务
         self.getById("addAssign").addEventListener("click", function () {
