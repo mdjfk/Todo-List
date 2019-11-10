@@ -71,30 +71,48 @@ var todo = {
                 self.getByClass("content")[0].innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
                 self.getById("inputeDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
             } else {
-                alert('Choose a subCategory before adding a assignment');
+                alert('Choose a subCategory before adding an assignment');
             }
 
         }, false);
         //完成编辑
         self.getByClass("glyphicon-ok")[0].addEventListener("click", function () {
             var date = self.getById("deadline").value,
-                title = self.getById("assTitle").value;
+                title = self.getById("assTitle").value,
+                parentNode = self.getByClass("middleItem")[0],
+                added = false;
             if (self.getById("assTitle").value && date) { //任务标题与deadline不为空
                 self.getById("assignTitle").innerHTML = title;
                 self.getById("inputeDate").innerHTML = date;
                 self.getByClass("content")[0].innerHTML = self.getById("assContent").value;
+
+                //任务信息存到本地存储中（title,date,content,status）以title为索引项
+
+                //点击提交任务后默认显示所有任务（所有标签为选中状态）
+
                 //任务新增在任务栏中
-                for (var subDiv = self.getByClass("middleItem")[0].firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
-                    if (subDiv.getAttribute("data-duedate") === date) {
+                for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
+                    if (subDiv.getAttribute("data-duedate") > date) { //新增任务日期比所有已存在日期都小
+                        console.log("true");
+                        var fragment = document.createElement("DIV");
+                        fragment.setAttribute("data-duedate", date);
+                        fragment.innerHTML = "<div class ='dateGroup'>" + date + "</div> <div class ='titleGroup'>" + title + "</div>";
+                        parentNode.insertBefore(fragment, subDiv);
+                        added = true;
                         break;
-                    };
+                    } else if (subDiv.getAttribute("data-duedate") === date) { //已存在该日期分类
+                        break;
+                    }
 
                 }
-                if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
-                    subDiv.innerHTML += "<div class='titleGroup'>" + title + "</div>";
-                } else { //新增日期与任务
-                    self.getByClass("middleItem")[0].innerHTML += "<div data-duedate=" + date + "> <div class ='dateGroup'>" + date + "</div> <div class ='titleGroup'>" + title + "</div></div>";
+                if (!added) {
+                    if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
+                        subDiv.innerHTML += "<div class='titleGroup'>" + title + "</div>";
+                    } else { //新增任务日期比所有已存在日期都大，添加到最末尾
+                        parentNode.innerHTML += "<div data-duedate=" + date + "> <div class ='dateGroup'>" + date + "</div> <div class ='titleGroup'>" + title + "</div></div>";
+                    }
                 }
+                //添加任务点击响应：显示对应任务内容
 
             } else {
                 alert("Title and due date is a must!");
