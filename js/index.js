@@ -79,24 +79,38 @@ var todo = {
         self.getByClass("glyphicon-ok")[0].addEventListener("click", function () {
             var date = self.getById("deadline").value,
                 title = self.getById("assTitle").value,
+                content = self.getById("assContent").value,
                 parentNode = self.getByClass("middleItem")[0],
+                assignTitle = self.getById("assignTitle"),
+                inputeDate = self.getById("inputeDate"),
+                contentContainer = self.getByClass("content")[0],
                 added = false;
             if (self.getById("assTitle").value && date) { //任务标题与deadline不为空
-                self.getById("assignTitle").innerHTML = title;
-                self.getById("inputeDate").innerHTML = date;
-                self.getByClass("content")[0].innerHTML = self.getById("assContent").value;
-
+                assignTitle.innerHTML = title;
+                inputeDate.innerHTML = date;
+                contentContainer.innerHTML = content;
+                var obj = {
+                    title: title,
+                    date: date,
+                    content: content,
+                    finished: 0
+                };
                 //任务信息存到本地存储中（title,date,content,status）以title为索引项
+                localStorage.setItem(title, JSON.stringify(obj));
+                //点击提交任务后新任务默认显示在所有任务下（所有标签为选中状态）
 
-                //点击提交任务后默认显示所有任务（所有标签为选中状态）
 
+                var assign = document.createElement("DIV");
+                assign.classList.add("titleGroup");
+                assign.innerHTML = title;
                 //任务新增在任务栏中
                 for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
                     if (subDiv.getAttribute("data-duedate") > date) { //新增任务日期比所有已存在日期都小
                         console.log("true");
                         var fragment = document.createElement("DIV");
                         fragment.setAttribute("data-duedate", date);
-                        fragment.innerHTML = "<div class ='dateGroup'>" + date + "</div> <div class ='titleGroup'>" + title + "</div>";
+                        fragment.innerHTML = "<div class ='dateGroup'>" + date + "</div>";
+                        fragment.appendChild(assign);
                         parentNode.insertBefore(fragment, subDiv);
                         added = true;
                         break;
@@ -107,12 +121,25 @@ var todo = {
                 }
                 if (!added) {
                     if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
-                        subDiv.innerHTML += "<div class='titleGroup'>" + title + "</div>";
+                        subDiv.appendChild(assign);
+                        // subDiv.innerHTML += "<div class='titleGroup'>" + title + "</div>";
                     } else { //新增任务日期比所有已存在日期都大，添加到最末尾
-                        parentNode.innerHTML += "<div data-duedate=" + date + "> <div class ='dateGroup'>" + date + "</div> <div class ='titleGroup'>" + title + "</div></div>";
+                        // parentNode.innerHTML += "<div data-duedate=" + date + "> <div class ='dateGroup'>" + date + "</div> <div class ='titleGroup'>" + title + "</div></div>";
+                        var fragment = document.createElement("DIV");
+                        fragment.setAttribute("data-duedate", date);
+                        fragment.innerHTML = "<div class ='dateGroup'>" + date + "</div>";
+                        fragment.appendChild(assign);
+                        parentNode.appendChild(fragment);
                     }
                 }
                 //添加任务点击响应：显示对应任务内容
+                assign.addEventListener("click", function (e) {
+                    var title = e.target.innerHTML;
+                    var obj = JSON.parse(localStorage.getItem(title));
+                    assignTitle.innerHTML = obj.title;
+                    inputeDate.innerHTML = obj.date;
+                    contentContainer.innerHTML = obj.content;
+                }, false);
 
             } else {
                 alert("Title and due date is a must!");
