@@ -50,22 +50,23 @@
                     <div class="fliter">已完成</div>
                 </div>
                 <div class="middleItem">
-                    <div data-duedate="2019-11-12">
-                        <div class="dateGroup">
+                    <!-- <div class="dateGroup" data-duedate="2019-11-12">
+                        <div class="dateBlock">
                             2019-11-12
                         </div>
-                        <div class="titleGroup">
-                            title2 <div style="float: right;"><span class="glyphicon glyphicon-ok"></span></div>
+                        <div class="titleGroup" data-assignIndex="">
+                            <span class="theTitle">title2</span>
+                            <div style="float: right;"><span class="glyphicon glyphicon-ok"></span></div>
                         </div>
                     </div>
-                    <div data-duedate="2019-11-12">
-                        <div class="dateGroup">
+                    <div class="dateGroup" data-duedate="2019-11-12">
+                        <div class="dateBlock">
                             2019-11-12
                         </div>
                         <div class="titleGroup">
                             title2
                         </div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="addItem" id="addAssign">
@@ -78,15 +79,20 @@
                     <div id="assignTitle">to do 6
 
                     </div>
-                    <div id="titleIcon">
-                        <span class="glyphicon glyphicon-ok"></span>
+                    <div class="titleIcon">
+                        <span class="glyphicon glyphicon-check"></span>
+                        <span class="glyphicon glyphicon-edit"></span>
+                    </div>
+                    <div class="titleIcon hide">
+                        <span class="glyphicon glyphicon-remove"></span>
+                        <span class="glyphicon glyphicon-ok" id="glyphicon-ok"></span>
                     </div>
                 </div>
                 <div class="rightTimeBar">
                     <span>Due date: </span>
                     <span id="inputeDate"></span>
                 </div>
-                <div class="content">
+                <div id="content">
                     正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分正文部分</div>
             </div>
 

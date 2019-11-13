@@ -78,7 +78,7 @@ body {
     position: relative;
 }
 
-.content {
+#content {
     padding: 15px;
     line-height: 130%;
     border-top: 1px solid grey;
@@ -200,12 +200,16 @@ body {
     background-color: transparent;
 }
 
-#titleIcon {
-    width: 45px;
-    height: 45px;
-    font-size: 26px;
-    /* float: right; */
+.titleIcon {
+    width: 120px;
+    height: 50px;
+    padding: 5px 0;
     flex: none;
+}
+
+.titleIcon .glyphicon {
+    font-size: 30px;
+    margin-right: 20px;
 }
 
 .inputTitle {
@@ -242,7 +246,7 @@ body {
     margin-top: 40px;
 }
 
-.dateGroup {
+.dateBlock {
     height: 36px;
     line-height: 36px;
     padding: 0 0 0 20px;
