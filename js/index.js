@@ -41,7 +41,7 @@ var todo = {
                 self.getById("addName").value = "";
                 select.options[0].selected = true;
             } else {
-                alert("Please input a name for the new category!");
+                alert("Please input the name of the new category!");
             }
 
         }, false);
@@ -73,11 +73,13 @@ var todo = {
                 self.getById("content").innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
                 self.getById("inputeDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
 
+                //新建任务时，chosenAssign设为没有任务被选中
+                self.chosenAssign = 0;
                 //右上按钮变为 取消编辑和完成编辑
                 self.getByClass("titleIcon")[0].classList.toggle("hide");
                 self.getByClass("titleIcon")[1].classList.toggle("hide");
             } else {
-                alert('Choose a subCategory before adding an assignment');
+                alert('Please choose a subCategory before adding an assignment');
             }
 
         }, false);
@@ -85,16 +87,17 @@ var todo = {
         //任务完成按钮
         self.getByClass("glyphicon-check")[0].addEventListener("click", function () {
             //对应任务title显示完成标签 如何找到对应任务？ 用chosenAssign存储被选中的assignIndex
-            if (self.chosenAssign) {
+            if (self.chosenAssign) { //选中了一个任务
                 var assignment = self.getByClass("titleGroup")[self.chosenAssign - 1];
-                if (!parseInt(assignment.getAttribute("data-status"))) { //如果该任务未完成（为0）
+                if (parseInt(assignment.getAttribute("data-status")) === 0) { //如果该任务未完成（data-status为0）
                     assignment.innerHTML += "<div style='float: right;'><span class='glyphicon glyphicon-ok'></span></div>";
                     assignment.setAttribute("data-status", "1");
+                } else { //如果该任务已完成
+                    alert('The assignment has been finished!');
                 }
             } else {
-                alert('Chose an assignment first!');
+                alert('Please choose an assignment first!');
             }
-            //任务完成后 再点击check提示“该任务已完成” 但允许点edit编辑
 
         });
         //编辑任务按钮
@@ -112,29 +115,43 @@ var todo = {
                 self.getByClass("titleIcon")[0].classList.toggle("hide");
                 self.getByClass("titleIcon")[1].classList.toggle("hide");
             } else {
-                alert('Chose an assignment first!');
+                alert('Please choose an assignment first!');
             }
 
         });
         //取消编辑按钮
         self.getByClass("glyphicon-remove")[0].addEventListener("click", function () {
-            //如果已经有内容，显示原来的内容
-            //如果是新建任务，显示第一个没完成的任务
+            var index = self.chosenAssign,
+                assignTitle = self.getById("assignTitle"),
+                inputeDate = self.getById("inputeDate"),
+                contentContainer = self.getById("content");
+            if (index) { //非新建任务，显示chosenAssign的任务信息
+                var obj = JSON.parse(localStorage.getItem("Index" + index));
+                assignTitle.innerHTML = obj.title;
+                inputeDate.innerHTML = obj.date;
+                contentContainer.innerHTML = obj.content;
+            } else { //新建任务，右边信息清空
+                assignTitle.innerHTML = "";
+                inputeDate.innerHTML = "";
+                contentContainer.innerHTML = "";
+            }
+
             //右上按钮变为 完成和编辑按钮
             self.getByClass("titleIcon")[0].classList.toggle("hide");
             self.getByClass("titleIcon")[1].classList.toggle("hide");
         });
-        //完成编辑按钮 新增或修改
+        //完成编辑按钮 新增（chosenAssign为0）或修改（chosenAssign不为0）
         self.getById("glyphicon-ok").addEventListener("click", function () {
             var date = self.getById("deadline").value,
                 title = self.getById("assTitle").value,
-                content = self.getById("assContent").value,
-                parentNode = self.getByClass("middleItem")[0],
-                assignTitle = self.getById("assignTitle"),
-                inputeDate = self.getById("inputeDate"),
-                contentContainer = self.getById("content"),
-                added = false;
-            if (self.getById("assTitle").value && date) { //任务标题与deadline不为空
+                content = self.getById("assContent").value;
+
+            if (title && date && content) { //任务标题、deadline、内容不为空
+                var parentNode = self.getByClass("middleItem")[0],
+                    assignTitle = self.getById("assignTitle"),
+                    inputeDate = self.getById("inputeDate"),
+                    contentContainer = self.getById("content"),
+                    added = false;
                 assignTitle.innerHTML = title;
                 inputeDate.innerHTML = date;
                 contentContainer.innerHTML = content;
@@ -143,66 +160,79 @@ var todo = {
                     date: date,
                     content: content
                 };
-                //任务信息存到本地存储中（title,date,content）以title为索引项，status保存在DOM中
-                localStorage.setItem("Index" + self.assignIndex, JSON.stringify(obj)); //title
-                //点击提交任务后新任务默认显示在所有任务下（所有标签为选中状态）
-                var nodes = self.getByClass("fliter");
-                nodes[0].classList.add("fliterBackground");
-                nodes[1].classList.remove("fliterBackground");
-                nodes[2].classList.remove("fliterBackground");
-                //显示所有任务
-                self.traverseClassNode(["dateGroup", "dateBlock", "titleGroup"], function (node) {
-                    node.classList.remove("hide");
-                });
 
-                var assign = document.createElement("DIV");
-                assign.classList.add("titleGroup");
-                assign.setAttribute("data-status", "0");
-                self.chosenAssign = self.assignIndex;
-                assign.setAttribute("data-assignIndex", self.assignIndex++);
-                assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
+                if (self.chosenAssign === 0) { //新增
+                    //任务信息存到本地存储中（title,date,content）以title为索引项，status保存在DOM中
+                    localStorage.setItem("Index" + self.assignIndex, JSON.stringify(obj)); //title
+                    //点击提交任务后新任务默认显示在所有任务下（所有标签为选中状态）
+                    var nodes = self.getByClass("fliter");
+                    nodes[0].classList.add("fliterBackground");
+                    nodes[1].classList.remove("fliterBackground");
+                    nodes[2].classList.remove("fliterBackground");
+                    //显示所有任务
+                    self.traverseClassNode(["dateGroup", "dateBlock", "titleGroup"], function (node) {
+                        node.classList.remove("hide");
+                    });
 
-                //任务新增在任务栏中
-                for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
-                    if (subDiv.getAttribute("data-duedate") > date) { //新增任务日期比所有已存在日期都小
-                        console.log("true");
-                        var fragment = document.createElement("DIV");
-                        fragment.classList.add("dateGroup");
-                        fragment.setAttribute("data-duedate", date);
-                        fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
-                        fragment.appendChild(assign);
-                        parentNode.insertBefore(fragment, subDiv);
-                        added = true;
-                        break;
-                    } else if (subDiv.getAttribute("data-duedate") === date) { //已存在该日期分类
-                        break;
+                    var assign = document.createElement("DIV");
+                    assign.classList.add("titleGroup");
+                    assign.setAttribute("data-status", "0");
+                    self.chosenAssign = self.assignIndex; //新增的任务成为选中任务
+                    assign.setAttribute("data-assignIndex", self.assignIndex++);
+                    assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
+
+                    //任务新增在任务栏中
+                    for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
+                        if (subDiv.getAttribute("data-duedate") > date) { //新增任务日期比所有已存在日期都小
+                            var fragment = document.createElement("DIV");
+                            fragment.classList.add("dateGroup");
+                            fragment.setAttribute("data-duedate", date);
+                            fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
+                            fragment.appendChild(assign);
+                            parentNode.insertBefore(fragment, subDiv);
+                            added = true;
+                            break;
+                        } else if (subDiv.getAttribute("data-duedate") === date) { //已存在该日期分类
+                            break;
+                        }
+
+                    }
+                    if (!added) {
+                        if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
+                            subDiv.appendChild(assign);
+                        } else { //新增任务日期比所有已存在日期都大，添加到最末尾
+                            var fragment = document.createElement("DIV");
+                            fragment.classList.add("dateGroup");
+                            fragment.setAttribute("data-duedate", date);
+                            fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
+                            fragment.appendChild(assign);
+                            parentNode.appendChild(fragment);
+                        }
+                    }
+                    //添加任务点击响应：显示对应任务内容
+                    assign.addEventListener("click", function (e) {
+                        var target = e.target,
+                            // title = target.firstElementChild.innerHTML,
+                            index = parseInt(target.getAttribute("data-assignIndex")),
+                            obj = JSON.parse(localStorage.getItem("Index" + index));
+                        assignTitle.innerHTML = obj.title;
+                        inputeDate.innerHTML = obj.date;
+                        contentContainer.innerHTML = obj.content;
+                        self.chosenAssign = index;
+                    }, false);
+                } else { //修改
+                    var origin = JSON.parse(localStorage.getItem("Index" + self.chosenAssign));
+                    if (origin.date > date) { //日期变小了
+                        //从头开始遍历
+                    } else if (origin.date < date) { //日期变大了                        
+                        //从原来日期的下一个开始遍历
+
                     }
 
-                }
-                if (!added) {
-                    if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
-                        subDiv.appendChild(assign);
-                    } else { //新增任务日期比所有已存在日期都大，添加到最末尾
-                        var fragment = document.createElement("DIV");
-                        fragment.classList.add("dateGroup");
-                        fragment.setAttribute("data-duedate", date);
-                        fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
-                        fragment.appendChild(assign);
-                        parentNode.appendChild(fragment);
-                    }
-                }
-                //添加任务点击响应：显示对应任务内容
-                assign.addEventListener("click", function (e) {
-                    var target = e.target,
-                        title = target.firstElementChild.innerHTML,
+                    localStorage.setItem("Index" + self.chosenAssign, JSON.stringify(obj));
+                    // self.getByClass("titleGroup")[self.chosenAssign - 1].firstElementChild.innerHTML = title;
 
-                        index = parseInt(target.getAttribute("data-assignIndex")),
-                        obj = JSON.parse(localStorage.getItem("Index" + index));
-                    assignTitle.innerHTML = obj.title;
-                    inputeDate.innerHTML = obj.date;
-                    contentContainer.innerHTML = obj.content;
-                    self.chosenAssign = index;
-                }, false);
+                }
 
                 self.getByClass("titleIcon")[0].classList.toggle("hide");
                 self.getByClass("titleIcon")[1].classList.toggle("hide");
