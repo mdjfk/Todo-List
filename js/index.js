@@ -231,7 +231,7 @@ var todo = {
                         //从头开始遍历
                         self.addAssignment(parentNode.firstElementChild, date, self.chosenAssign);
                     } else if (origin.date < date) { //日期变大了
-                        //从原来日期的下一个开始遍历
+                        //从原来日期的下一个日期开始遍历
                         self.addAssignment(self.chosenAssign.nextElementSibling, date, self.chosenAssign);
                     }
                     self.chosenAssign.firstElementChild.innerHTML = title;
