@@ -134,7 +134,7 @@ body {
     justify-content: flex-start;
 }
 
-.fliter {
+.filter {
     height: 30px;
     padding: 0 8px;
     margin: 0 3px;
@@ -145,12 +145,12 @@ body {
     border-radius: 8px;
 }
 
-.fliter:hover {
+.filter:hover {
     border: 1px solid grey;
     background-color: rgb(236, 228, 228);
 }
 
-.fliterBackground {
+.filterBackground {
     border: 1px solid grey;
     background-color: rgb(236, 228, 228);
 }
