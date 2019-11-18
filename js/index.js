@@ -273,6 +273,13 @@ var todo = {
                 self.getById("leftItem").innerHTML += "<div class='category' data-category='" + this.name + "'><div class='mainCat'><span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div></div>";
 
                 self.getById("subCat").innerHTML += "<option value='" + this.name + "'>" + this.name + "</option>";
+                var str = localStorage.getItem("name");
+                if (str) {
+                    var arr = JSON.parse(arr);
+                    arr.push(this.name);
+                } else {
+                    localStorage.setItem("name", '[" + this.name + "]');
+                }
             }
 
         };
@@ -343,6 +350,25 @@ var todo = {
         }
         if (originParent.childElementCount < 2) {
             parentNode.removeChild(originParent);
+        }
+    },
+    initData: function () {
+        var str = localStorage.getItem("name");
+        if (str) {
+            var arr_name = JSON.parse(str);
+            for (let i = 0, len = arr_name.length; i < len; i++) {
+                new Category(arr_namer[i], 0).addCat();
+                var sub = localStorage.getItem(arr_namer[i]);
+                if (sub) {
+                    var sub_name = JSON.parse(sub);
+                    for (let i = 0, len = sub_name.length; i < len; i++) {
+                        new Category(sub_name[i], 0).addSub();
+
+                    }
+                }
+
+            }
+
         }
     }
 };
