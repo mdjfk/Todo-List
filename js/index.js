@@ -5,15 +5,37 @@ var todo = {
     init: function () {
         var self = this;
 
-        self.getByClass("addItem")[0].addEventListener("click", function () {
+        //新增分类按钮
+        self.getById("addCat").addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "inline";
         }, false);
+
+        //新增任务按钮
+        self.getById("addAssign").addEventListener("click", function () {
+            //if 选中分类
+            if (self.chosenSubtitle > -1) {
+                self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
+                self.getById("content").innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
+                self.getById("inputDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
+
+                //新建任务时，chosenAssign设为没有任务被选中
+                self.chosenAssign = null;
+                //右上按钮变为 取消编辑和完成编辑
+                self.getByClass("titleIcon")[0].classList.toggle("hide");
+                self.getByClass("titleIcon")[1].classList.toggle("hide");
+            } else {
+                alert('Please choose a subCategory before adding an assignment');
+            }
+
+        }, false);
+
         //弹窗 取消按钮
         self.getById("btnCancel").addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "none";
             self.getById("addName").value = "";
             self.getById("subCat").options[0].selected = true;
         }, false);
+
         //弹窗 确认按钮
         self.getById("btnConfirm").addEventListener("click", function () {
             var select = self.getById("subCat"),
@@ -45,44 +67,6 @@ var todo = {
             }
 
         }, false);
-        //显示及隐藏删除图标
-        var toggleShow = function (e) {
-            var tar = e.target.getElementsByClassName("trashIcon");
-            if (tar.length) {
-                tar[0].classList.toggle("hide");
-
-            }
-        };
-        self.classAddListener("mainCat", "mouseenter", toggleShow);
-        self.classAddListener("mainCat", "mouseleave", toggleShow);
-        self.classAddListener("subCat", "mouseenter", toggleShow);
-        self.classAddListener("subCat", "mouseleave", toggleShow);
-        //选中子分类样式
-        self.classAddListener("subCat", "click", function (e) {
-            self.traverseClassNode(["subCat"], function (x) {
-                x.classList.remove("chosen");
-            });
-            self.chosenSubtitle = e.currentTarget.getAttribute("data-index");
-            e.currentTarget.classList.add("chosen");
-        });
-        //新增任务
-        self.getById("addAssign").addEventListener("click", function () {
-            //if 选中分类
-            if (self.chosenSubtitle > -1) {
-                self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
-                self.getById("content").innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
-                self.getById("inputDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
-
-                //新建任务时，chosenAssign设为没有任务被选中
-                self.chosenAssign = null;
-                //右上按钮变为 取消编辑和完成编辑
-                self.getByClass("titleIcon")[0].classList.toggle("hide");
-                self.getByClass("titleIcon")[1].classList.toggle("hide");
-            } else {
-                alert('Please choose a subCategory before adding an assignment');
-            }
-
-        }, false);
 
         //任务完成按钮
         self.getByClass("glyphicon-check")[0].addEventListener("click", function () {
@@ -103,6 +87,7 @@ var todo = {
             }
 
         });
+
         //编辑任务按钮
         self.getByClass("glyphicon-edit")[0].addEventListener("click", function () {
             if (self.chosenAssign) { //选中了一个任务
@@ -122,6 +107,7 @@ var todo = {
             }
 
         });
+
         //取消编辑按钮
         self.getByClass("glyphicon-remove")[0].addEventListener("click", function () {
             var index = self.chosenAssign,
@@ -143,6 +129,7 @@ var todo = {
             self.getByClass("titleIcon")[0].classList.toggle("hide");
             self.getByClass("titleIcon")[1].classList.toggle("hide");
         });
+
         //完成编辑按钮 新增（chosenAssign为0）或修改（chosenAssign不为0）
         self.getById("glyphicon-ok").addEventListener("click", function () {
             var date = self.getById("deadline").value,
@@ -246,19 +233,38 @@ var todo = {
             }
         }, false);
 
+        //-------------------------每个主分类、子分类被添加后都要再次添加，主分类、子分类是动态的------------------------//
+        //显示及隐藏删除图标
+        function toggleShow(e) {
+            var tar = e.target.getElementsByClassName("trashIcon");
+            if (tar.length) {
+                tar[0].classList.toggle("hide");
+            }
+        }
+        //显示及隐藏删除图标
+        function toggleTrashIcon(node) {
+            node.addEventListener("mouseenter", toggleShow, false);
+            node.addEventListener("mouseleave", toggleShow, false);
+        }
+        // self.classAddListener("mainCat", "mouseenter", toggleShow);
+        // self.classAddListener("mainCat", "mouseleave", toggleShow);
+        // self.classAddListener("subCat", "mouseenter", toggleShow);
+        // self.classAddListener("subCat", "mouseleave", toggleShow);
+
+        //-------------------------------------------------//
         var Category = function (name, num) {
             this.name = name;
             this.num = num;
         };
         Category.prototype = {
-            /* add sub assign */
+            /** 添加子分类 */
             addSub: function (node) {
                 var div = document.createElement("DIV");
                 div.classList.add("subCat");
-                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）";
+                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
                 node.appendChild(div);
                 // node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
-                // console.log();
+                //选中子分类样式
                 div.addEventListener("click", function (e) {
                     todo.traverseClassNode(["subCat"], function (x) {
                         x.classList.remove("chosen");
@@ -266,23 +272,73 @@ var todo = {
                     todo.chosenSubtitle = e.currentTarget.getAttribute("data-index");
                     e.currentTarget.classList.add("chosen");
                 }, false);
+                //显示及隐藏删除图标
+                toggleTrashIcon(div);
+                //TODO:删除图标点击响应——视图上删除该分类，任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？）
+
+                //数据存储
+                self.addItemToArr(this.name, node.getAttribute("data-category"));
+
 
             },
-            /** add new category  */
+            /** 添加主分类 */
             addCat: function () {
-                self.getById("leftItem").innerHTML += "<div class='category' data-category='" + this.name + "'><div class='mainCat'><span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div></div>";
-
+                var cat = document.createElement("DIV");
+                cat.classList.add("category");
+                cat.setAttribute("data-category", this.name);
+                var mainCat = document.createElement("DIV");
+                mainCat.classList.add("mainCat");
+                cat.appendChild(mainCat);
+                mainCat.innerHTML = "<span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inMainCat hide'></span>";
+                self.getById("leftItem").appendChild(cat);
+                // cat.innerHTML = "<div class='mainCat'><span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inMainCat hide'></span></div>";
+                // self.getById("leftItem").innerHTML += "<div class='category' data-category='" + this.name + "'><div class='mainCat'><span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inMainCat hide'></span></div></div>";
+                //新建的主分类添加到弹框的下拉框中
                 self.getById("subCat").innerHTML += "<option value='" + this.name + "'>" + this.name + "</option>";
-                var str = localStorage.getItem("name");
-                if (str) {
-                    var arr = JSON.parse(arr);
-                    arr.push(this.name);
-                } else {
-                    localStorage.setItem("name", '[" + this.name + "]');
-                }
+                //显示及隐藏删除图标
+                toggleTrashIcon(mainCat);
+                //TODO:删除图标点击响应——视图上删除该分类（及其子分类），任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？）
+
+                //数据存储
+                self.addItemToArr(this.name, "name");
+
+                return cat;
             }
 
         };
+
+        initData();
+
+        function initData() {
+            if (!localStorage.getItem("name")) {
+                let arr = ["默认分类"];
+                localStorage.setItem("name", JSON.stringify(arr));
+            }
+            var str = localStorage.getItem("name");
+            var arr_name = eval('(' + str + ')');
+            // var arr_name = JSON.parse(str);
+            var sub = localStorage.getItem(arr_name[0]);
+            if (sub) {
+                var sub_name = JSON.parse(sub);
+                for (let i = 0, len = sub_name.length; i < len; i++) {
+                    new Category(sub_name[i], 0).addSub(self.getByClass("defaultCat")[0]);
+
+                }
+            }
+            for (let i = 1, len = arr_name.length; i < len; i++) {
+                let cat = new Category(arr_name[i], 0).addCat();
+                let sub = localStorage.getItem(arr_name[i]);
+                if (sub) {
+                    let sub_name = JSON.parse(sub);
+                    for (let i = 0, len = sub_name.length; i < len; i++) {
+                        new Category(sub_name[i], 0).addSub(cat);
+
+                    }
+                }
+
+            }
+
+        }
     },
     getById: function (id) {
         return document.getElementById(id);
@@ -353,22 +409,35 @@ var todo = {
         }
     },
     initData: function () {
+        if (!localStorage.getItem("name")) {
+            let arr = ["默认分类"];
+            localStorage.setItem("name", JSON.stringify(arr));
+        }
         var str = localStorage.getItem("name");
-        if (str) {
-            var arr_name = JSON.parse(str);
-            for (let i = 0, len = arr_name.length; i < len; i++) {
-                new Category(arr_namer[i], 0).addCat();
-                var sub = localStorage.getItem(arr_namer[i]);
-                if (sub) {
-                    var sub_name = JSON.parse(sub);
-                    for (let i = 0, len = sub_name.length; i < len; i++) {
-                        new Category(sub_name[i], 0).addSub();
+        var arr_name = eval('(' + str + ')');
+        // var arr_name = JSON.parse(str);
+        for (let i = 0, len = arr_name.length; i < len; i++) {
+            var cat = new Category(arr_namer[i], 0).addCat();
+            var sub = localStorage.getItem(arr_namer[i]);
+            if (sub) {
+                var sub_name = JSON.parse(sub);
+                for (let i = 0, len = sub_name.length; i < len; i++) {
+                    new Category(sub_name[i], 0).addSub(cat);
 
-                    }
                 }
-
             }
 
+        }
+
+    },
+    addItemToArr: function (item, arrName) {
+        var str = localStorage.getItem(arrName);
+        if (str) {
+            // var arr = JSON.parse(str);
+            var arr = eval('(' + str + ')');
+            arr.push(item);
+        } else {
+            localStorage.setItem(arrName, '[' + item + ']');
         }
     }
 };
