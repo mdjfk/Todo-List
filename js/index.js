@@ -4,7 +4,7 @@ var todo = {
     assignIndex: 1,
     init: function () {
         var self = this;
-
+        // localStorage.clear();
         //新增分类按钮
         self.getById("addCat").addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "inline";
@@ -258,7 +258,8 @@ var todo = {
         };
         Category.prototype = {
             /** 添加子分类 */
-            addSub: function (node) {
+            addSub: function (node, addItem) {
+                addItem = (typeof addItem === "undefined") ? 1 : addItem;
                 var div = document.createElement("DIV");
                 div.classList.add("subCat");
                 div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
@@ -277,12 +278,13 @@ var todo = {
                 //TODO:删除图标点击响应——视图上删除该分类，任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？）
 
                 //数据存储
-                self.addItemToArr(this.name, node.getAttribute("data-category"));
-
-
+                if (addItem) {
+                    self.addItemToArr(this.name, node.getAttribute("data-category"));
+                }
             },
             /** 添加主分类 */
-            addCat: function () {
+            addCat: function (addItem) {
+                addItem = (typeof addItem === "undefined") ? 1 : addItem;
                 var cat = document.createElement("DIV");
                 cat.classList.add("category");
                 cat.setAttribute("data-category", this.name);
@@ -299,9 +301,12 @@ var todo = {
                 toggleTrashIcon(mainCat);
                 //TODO:删除图标点击响应——视图上删除该分类（及其子分类），任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？）
 
-                //数据存储
-                self.addItemToArr(this.name, "name");
 
+                if (addItem) {
+                    //数据存储
+                    self.addItemToArr(this.name, "name");
+
+                }
                 return cat;
             }
 
@@ -310,34 +315,38 @@ var todo = {
         initData();
 
         function initData() {
+            var arr_name = null;
             if (!localStorage.getItem("name")) {
                 let arr = ["默认分类"];
                 localStorage.setItem("name", JSON.stringify(arr));
+                arr_name = arr;
+            } else {
+                var str = localStorage.getItem("name");
+                arr_name = eval('(' + str + ')');
             }
-            var str = localStorage.getItem("name");
-            var arr_name = eval('(' + str + ')');
-            // var arr_name = JSON.parse(str);
-            var sub = localStorage.getItem(arr_name[0]);
-            if (sub) {
-                var sub_name = JSON.parse(sub);
-                for (let i = 0, len = sub_name.length; i < len; i++) {
-                    new Category(sub_name[i], 0).addSub(self.getByClass("defaultCat")[0]);
+            self.clearData();
+            // var sub = localStorage.getItem(arr_name[0]);
+            // if (sub) {
+            //     var sub_name = JSON.parse(sub);
+            //     for (let i = 0, len = sub_name.length; i < len; i++) {
+            //         new Category(sub_name[i], 0).addSub(self.getByClass("defaultCat")[0]);
 
-                }
-            }
-            for (let i = 1, len = arr_name.length; i < len; i++) {
-                let cat = new Category(arr_name[i], 0).addCat();
+            //     }
+            // }
+            for (let i = 0, len = arr_name.length; i < len; i++) {
+                let cat = new Category(arr_name[i], 0).addCat(0);
                 let sub = localStorage.getItem(arr_name[i]);
                 if (sub) {
                     let sub_name = JSON.parse(sub);
                     for (let i = 0, len = sub_name.length; i < len; i++) {
-                        new Category(sub_name[i], 0).addSub(cat);
+                        new Category(sub_name[i], 0).addSub(cat, 0);
 
                     }
                 }
 
             }
-
+            //移除默認分類的刪除圖標
+            self.getByClass("inMainCat")[0].remove();
         }
     },
     getById: function (id) {
@@ -405,39 +414,27 @@ var todo = {
             fragment.insertBefore(changedNode, null);
         }
         if (originParent.childElementCount < 2) {
-            parentNode.removeChild(originParent);
+            // parentNode.removeChild(originParent);
+            originParent.remove();
         }
     },
-    initData: function () {
-        if (!localStorage.getItem("name")) {
-            let arr = ["默认分类"];
-            localStorage.setItem("name", JSON.stringify(arr));
-        }
-        var str = localStorage.getItem("name");
-        var arr_name = eval('(' + str + ')');
-        // var arr_name = JSON.parse(str);
-        for (let i = 0, len = arr_name.length; i < len; i++) {
-            var cat = new Category(arr_namer[i], 0).addCat();
-            var sub = localStorage.getItem(arr_namer[i]);
-            if (sub) {
-                var sub_name = JSON.parse(sub);
-                for (let i = 0, len = sub_name.length; i < len; i++) {
-                    new Category(sub_name[i], 0).addSub(cat);
 
-                }
-            }
-
-        }
-
-    },
     addItemToArr: function (item, arrName) {
         var str = localStorage.getItem(arrName);
         if (str) {
             // var arr = JSON.parse(str);
             var arr = eval('(' + str + ')');
             arr.push(item);
+            localStorage.setItem(arrName, JSON.stringify(arr));
         } else {
             localStorage.setItem(arrName, '[' + item + ']');
         }
+    },
+    clearData: function () {
+        var self = this;
+        self.getById("subCat").innerHTML = "<option value='newCategory' selected>新建分类</option>";
+        self.traverseClassNode(["category"], function (node) {
+            node.remove();
+        });
     }
 };
