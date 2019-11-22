@@ -1,5 +1,6 @@
 var todo = {
-    chosenSubtitle: -1,
+    chosenCategory: null,
+    chosenSubtitle: null,
     chosenAssign: null,
     assignIndex: 1,
     init: function () {
@@ -13,7 +14,7 @@ var todo = {
         //新增任务按钮
         self.getById("addAssign").addEventListener("click", function () {
             //if 选中分类
-            if (self.chosenSubtitle > -1) {
+            if (self.chosenSubtitle) {
                 self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
                 self.getById("content").innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
                 self.getById("inputDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
@@ -246,10 +247,6 @@ var todo = {
             node.addEventListener("mouseenter", toggleShow, false);
             node.addEventListener("mouseleave", toggleShow, false);
         }
-        // self.classAddListener("mainCat", "mouseenter", toggleShow);
-        // self.classAddListener("mainCat", "mouseleave", toggleShow);
-        // self.classAddListener("subCat", "mouseenter", toggleShow);
-        // self.classAddListener("subCat", "mouseleave", toggleShow);
 
         //-------------------------------------------------//
         var Category = function (name, num) {
@@ -260,9 +257,10 @@ var todo = {
             /** 添加子分类 */
             addSub: function (node, addItem) {
                 addItem = (typeof addItem === "undefined") ? 1 : addItem;
-                var div = document.createElement("DIV");
+                var self = this,
+                    div = document.createElement("DIV");
                 div.classList.add("subCat");
-                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
+                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + self.name + " （<span class='assignNum'>" + self.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
                 node.appendChild(div);
                 // node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
                 //选中子分类样式
@@ -270,12 +268,15 @@ var todo = {
                     todo.traverseClassNode(["subCat"], function (x) {
                         x.classList.remove("chosen");
                     });
-                    todo.chosenSubtitle = e.currentTarget.getAttribute("data-index");
+                    // todo.chosenSubtitle = e.currentTarget.getAttribute("data-index");
+                    todo.chosenSubtitle = self.name;
+                    todo.chosenCategory = node.getAttribute("data-category");
+                    // alert(todo.chosenCategory + "+" + todo.chosenSubtitle);
                     e.currentTarget.classList.add("chosen");
                 }, false);
                 //显示及隐藏删除图标
                 toggleTrashIcon(div);
-                //TODO:删除图标点击响应——视图上删除该分类，任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？）
+                //TODO:删除图标点击响应——视图上删除该分类，任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？不会）
 
                 //数据存储
                 if (addItem) {
@@ -345,7 +346,7 @@ var todo = {
                 }
 
             }
-            //移除默認分類的刪除圖標
+            //移除默认分类的删除图标
             self.getByClass("inMainCat")[0].remove();
         }
     },
