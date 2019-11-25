@@ -168,6 +168,11 @@ var todo = {
                     var assign = document.createElement("DIV");
                     assign.classList.add("titleGroup");
                     assign.setAttribute("data-status", "0");
+
+                    //更新存储日期
+                    self.addItemToArr(date, "date");
+                    self.addItemToArr(self.assignIndex, date);
+
                     assign.setAttribute("data-assignIndex", self.assignIndex++);
                     assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
 
@@ -202,6 +207,8 @@ var todo = {
                             parentNode.appendChild(fragment);
                         }
                     }
+
+
                     //添加任务点击响应：显示对应任务内容
                     assign.addEventListener("click", function (e) {
                         var target = e.target,
@@ -414,10 +421,18 @@ var todo = {
             parentNode.insertBefore(fragment, subDiv);
             fragment.insertBefore(changedNode, null);
         }
+        //如果原来日期下移出任务后无任务，则删除
         if (originParent.childElementCount < 2) {
             // parentNode.removeChild(originParent);
+            //localStorage删除该日期，date删除该日期
+            localStorage.removeItem(originParent.getAttribute("data-deadline"));
+            self.removeItem(originParent.getAttribute("data-deadline"), "date");
+            //移除该日期
             originParent.remove();
         }
+        //更新存储日期
+        self.addItemToArr(newDate, "date");
+        self.addItemToArr(changedNode.getAttribute("data-assignIndex"), newDate);
     },
 
     addItemToArr: function (item, arrName) {
@@ -425,10 +440,25 @@ var todo = {
         if (str) {
             // var arr = JSON.parse(str);
             var arr = eval('(' + str + ')');
-            arr.push(item);
-            localStorage.setItem(arrName, JSON.stringify(arr));
+            if (!arr.includes(item)) {
+                arr.push(item);
+                localStorage.setItem(arrName, JSON.stringify(arr));
+            }
         } else {
             localStorage.setItem(arrName, '[' + item + ']');
+        }
+    },
+    removeItem: function (item, arrName) {
+        var str = localStorage.getItem(arrName);
+        if (str) {
+            var arr = eval('(' + str + ')'),
+                index = arr.indexOf(item);
+            if (index != -1) {
+                arr.splice(index, 1);
+                localStorage.setItem(arrName, JSON.stringify(arr));
+            }
+        } else {
+            alert("The arrName designated doesn't exist!");
         }
     },
     clearData: function () {
