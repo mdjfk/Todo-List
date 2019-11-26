@@ -3,6 +3,7 @@ var todo = {
     chosenSubtitle: null,
     chosenAssign: null,
     assignIndex: 1,
+    assignmentType: 0,
     init: function () {
         var self = this;
         // localStorage.clear();
@@ -160,7 +161,9 @@ var todo = {
                     nodes[0].classList.add("filterBackground");
                     nodes[1].classList.remove("filterBackground");
                     nodes[2].classList.remove("filterBackground");
-                    //显示所有任务
+                    self.assignmentType = 0;
+
+                    //显示所有任务（显示该分类下所有任务）
                     self.traverseClassNode(["dateGroup", "dateBlock", "titleGroup"], function (node) {
                         node.classList.remove("hide");
                     });
@@ -280,6 +283,10 @@ var todo = {
                     todo.chosenCategory = node.getAttribute("data-category");
                     // alert(todo.chosenCategory + "+" + todo.chosenSubtitle);
                     e.currentTarget.classList.add("chosen");
+
+                    //TODO:中栏显示该分类的任务
+                    self.filterAssignment(null, sub, status);
+
                 }, false);
                 //显示及隐藏删除图标
                 toggleTrashIcon(div);
@@ -319,7 +326,14 @@ var todo = {
             }
 
         };
-
+        Element.prototype = {
+            show: function () {
+                this.classList.remove("hide");
+            },
+            hide: function () {
+                this.classList.add("hide");
+            }
+        };
         initData();
 
         function initData() {
@@ -467,5 +481,52 @@ var todo = {
         self.traverseClassNode(["category"], function (node) {
             node.remove();
         });
+    },
+    showAllAssignment: function () {
+        var self = this;
+        self.traverseClassNode("dateGroup", function (node) {
+            node.classList.remove("hide");
+        });
+        self.traverseClassNode("titleGroup", function (node) {
+            node.classList.remove("hide");
+        });
+    },
+
+    filterAssignment: function (main, sub, status) {
+        var self = this;
+        self.traverseClassNode("dateGroup", function (node) {
+            let assignment = node.querySelectorAll(),
+                assignmentNum = assignment.length,
+                hideCount = 0,
+                flag = 0;
+            for (let i = 0; i < assignmentNum; i++) {
+                if (main) {
+                    if (localStorage.getItem(assignment[i].getAttribute("data-assignIndex") + "main") !== main) {
+                        assignment[i].hide();
+                        hideCount++;
+                    }
+                } else {
+                    if (sub) {
+                        if (localStorage.getItem(assignment[i].getAttribute("data-assignIndex") + "sub") !== sub) {
+                            flag = 1;
+                        }
+                    }
+                    if (status) {
+                        if (localStorage.getItem(assignment[i].getAttribute("data-assignIndex") + "status") !== status) {
+                            flag = 1;
+                        }
+                    }
+                    if (flag) {
+                        assignment[i].hide();
+                        hideCount++;
+                    }
+                }
+
+                if (assignmentNum === hideCount) {
+                    assignment.hide();
+                }
+            }
+        });
     }
+
 };
