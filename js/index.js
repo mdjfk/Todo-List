@@ -3,7 +3,7 @@ var todo = {
     chosenSubtitle: null,
     chosenAssign: null,
     assignIndex: 1,
-    assignmentType: 0,
+    assignmentType: null,
     init: function () {
         var self = this;
         // localStorage.clear();
@@ -175,6 +175,9 @@ var todo = {
                     //更新存储日期
                     self.addItemToArr(date, "date");
                     self.addItemToArr(self.assignIndex, date);
+                    localStorage.setItem(self.assignIndex + "main", self.chosenCategory);
+                    localStorage.setItem(self.assignIndex + "sub", self.chosenSubtitle);
+                    localStorage.setItem(self.assignIndex + "status", 1);
 
                     assign.setAttribute("data-assignIndex", self.assignIndex++);
                     assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
@@ -266,6 +269,7 @@ var todo = {
         Category.prototype = {
             /** 添加子分类 */
             addSub: function (node, addItem) {
+                //新建（不定义addItem）或初始化显示（addItem置零）
                 addItem = (typeof addItem === "undefined") ? 1 : addItem;
                 var self = this,
                     div = document.createElement("DIV");
@@ -285,7 +289,8 @@ var todo = {
                     e.currentTarget.classList.add("chosen");
 
                     //TODO:中栏显示该分类的任务
-                    self.filterAssignment(null, sub, status);
+                    todo.showAllAssignment();
+                    todo.filterAssignment(null, self.name, todo.assignmentType);
 
                 }, false);
                 //显示及隐藏删除图标
@@ -315,7 +320,7 @@ var todo = {
                 //显示及隐藏删除图标
                 toggleTrashIcon(mainCat);
                 //TODO:删除图标点击响应——视图上删除该分类（及其子分类），任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？）
-
+                // self.filterAssignment(main, sub, status);
 
                 if (addItem) {
                     //数据存储
@@ -325,14 +330,6 @@ var todo = {
                 return cat;
             }
 
-        };
-        Element.prototype = {
-            show: function () {
-                this.classList.remove("hide");
-            },
-            hide: function () {
-                this.classList.add("hide");
-            }
         };
         initData();
 
@@ -374,7 +371,10 @@ var todo = {
     getById: function (id) {
         return document.getElementById(id);
     },
-    getByClass: function (className) {
+    getByClass: function (className, startPoint) {
+        if (typeof startPoint !== "undefined") {
+            return startPoint.getElementsByClassName(className);
+        }
         return document.getElementsByClassName(className);
     },
     getByTag: function (tag) {
@@ -482,50 +482,56 @@ var todo = {
             node.remove();
         });
     },
+    show: function (node) {
+        node.classList.remove("hide");
+    },
+    hide: function (node) {
+        node.classList.add("hide");
+    },
     showAllAssignment: function () {
         var self = this;
-        self.traverseClassNode("dateGroup", function (node) {
-            node.classList.remove("hide");
-        });
-        self.traverseClassNode("titleGroup", function (node) {
+        self.traverseClassNode(["dateGroup", "titleGroup"], function (node) {
             node.classList.remove("hide");
         });
     },
 
     filterAssignment: function (main, sub, status) {
         var self = this;
-        self.traverseClassNode("dateGroup", function (node) {
-            let assignment = node.querySelectorAll(),
-                assignmentNum = assignment.length,
+        self.traverseClassNode(["dateGroup"], function (node) {
+            // let assignments = node.querySelectorAll("titleGroup"),
+            let assignments = self.getByClass("titleGroup", node),
+                assignmentNum = assignments.length,
                 hideCount = 0,
                 flag = 0;
             for (let i = 0; i < assignmentNum; i++) {
                 if (main) {
-                    if (localStorage.getItem(assignment[i].getAttribute("data-assignIndex") + "main") !== main) {
-                        assignment[i].hide();
-                        hideCount++;
+                    if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "main") !== main) {
+                        flag = 1;
                     }
                 } else {
                     if (sub) {
-                        if (localStorage.getItem(assignment[i].getAttribute("data-assignIndex") + "sub") !== sub) {
+                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "sub") !== sub) {
                             flag = 1;
                         }
                     }
                     if (status) {
-                        if (localStorage.getItem(assignment[i].getAttribute("data-assignIndex") + "status") !== status) {
+                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "status") !== status) {
                             flag = 1;
                         }
                     }
-                    if (flag) {
-                        assignment[i].hide();
-                        hideCount++;
-                    }
+
+                }
+                if (flag) {
+                    self.hide(assignments[i]);
+                    hideCount++;
                 }
 
-                if (assignmentNum === hideCount) {
-                    assignment.hide();
-                }
             }
+
+            if (assignmentNum === hideCount) {
+                self.hide(node);
+            }
+
         });
     }
 
