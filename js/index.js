@@ -7,6 +7,11 @@ var todo = {
     init: function () {
         var self = this;
         // localStorage.clear();
+        //所有分类
+        self.getById("allAssignments").addEventListener("click", function () {
+            self.setFilter(0);
+            self.showAllAssignment();
+        });
         //新增分类按钮
         self.getById("addCat").addEventListener("click", function () {
             self.getByClass("popWindow")[0].style.display = "inline";
@@ -157,16 +162,11 @@ var todo = {
                     //任务信息存到本地存储中（title,date,content）以index为索引项，status保存在DOM中
                     localStorage.setItem("Index" + self.assignIndex, JSON.stringify(obj)); //title
                     //点击提交任务后新任务默认显示在所有任务下（所有标签为选中状态）
-                    var nodes = self.getByClass("filter");
-                    nodes[0].classList.add("filterBackground");
-                    nodes[1].classList.remove("filterBackground");
-                    nodes[2].classList.remove("filterBackground");
-                    self.assignmentType = 0;
+                    self.setFilter(0);
 
                     //显示所有任务（显示该分类下所有任务）
-                    self.traverseClassNode(["dateGroup", "dateBlock", "titleGroup"], function (node) {
-                        node.classList.remove("hide");
-                    });
+                    self.showAllAssignment();
+                    self.filterAssignment(null, self.chosenSubtitle, 0);
 
                     var assign = document.createElement("DIV");
                     assign.classList.add("titleGroup");
@@ -274,7 +274,7 @@ var todo = {
                 var self = this,
                     div = document.createElement("DIV");
                 div.classList.add("subCat");
-                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + self.name + " （<span class='assignNum'>" + self.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
+                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; <span class='subCat_string'>" + self.name + "</span> （<span class='assignNum'>" + self.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
                 node.appendChild(div);
                 // node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
                 //选中子分类样式
@@ -505,17 +505,17 @@ var todo = {
                 flag = 0;
             for (let i = 0; i < assignmentNum; i++) {
                 if (main) {
-                    if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "main") !== main) {
+                    if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "main") != main) {
                         flag = 1;
                     }
                 } else {
                     if (sub) {
-                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "sub") !== sub) {
+                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "sub") != sub) {
                             flag = 1;
                         }
                     }
                     if (status) {
-                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "status") !== status) {
+                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "status") != status) {
                             flag = 1;
                         }
                     }
@@ -533,6 +533,18 @@ var todo = {
             }
 
         });
+    },
+    //中栏筛选type=0所有=1未完成=2已完成
+    setFilter: function (type) {
+        var self = this,
+            nodes = self.getByClass("filter"),
+            len = nodes.length;
+        for (let i = 0; i < len; i++) {
+            nodes[i].classList.remove("filterBackground");
+        }
+        nodes[type].classList.add("filterBackground");
+        //设置筛选类型
+        self.assignmentType = type;
     }
 
 };
