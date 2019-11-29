@@ -166,7 +166,7 @@ var todo = {
 
                     //显示所有任务（显示该分类下所有任务）
                     self.showAllAssignment();
-                    self.filterAssignment(null, self.chosenSubtitle, 0);
+                    self.filterAssignment(null, self.chosenSubtitle.getAttribute("data-string"), 0);
 
                     var assign = document.createElement("DIV");
                     assign.classList.add("titleGroup");
@@ -175,8 +175,8 @@ var todo = {
                     //更新存储日期
                     self.addItemToArr(date, "date");
                     self.addItemToArr(self.assignIndex, date);
-                    localStorage.setItem(self.assignIndex + "main", self.chosenCategory);
-                    localStorage.setItem(self.assignIndex + "sub", self.chosenSubtitle);
+                    localStorage.setItem(self.assignIndex + "main", self.chosenCategory.getAttribute("data-category"));
+                    localStorage.setItem(self.assignIndex + "sub", self.chosenSubtitle.getAttribute("data-string"));
                     localStorage.setItem(self.assignIndex + "status", 1);
 
                     assign.setAttribute("data-assignIndex", self.assignIndex++);
@@ -214,10 +214,25 @@ var todo = {
                         }
                     }
 
+                    //主分类未完成任务数加一
+                    var numNode1 = self.getByClass("assignNum", self.chosenCategory)[0];
+                    numNode1.innerHTML = parseInt(numNode1.innerHTML) + 1;
+                    //TODO:存储localStorage
+
+                    //子分类未完成任务数加一
+                    var numNode2 = self.getByClass("assignNum", self.chosenSubtitle)[0];
+                    numNode2.innerHTML = parseInt(numNode2.innerHTML) + 1;
+                    //TODO:存储localStorage
+
+                    //所有任务未完成任务数加一
+                    var numNode3 = self.getById("assignNum");
+                    numNode3.innerHTML = parseInt(numNode3.innerHTML) + 1;
+                    //TODO:存储localStorage
+
 
                     //添加任务点击响应：显示对应任务内容
                     assign.addEventListener("click", function (e) {
-                        var target = e.target,
+                        var target = e.currentTarget,
                             // title = target.firstElementChild.innerHTML,
                             index = parseInt(target.getAttribute("data-assignIndex")),
                             obj = JSON.parse(localStorage.getItem("Index" + index));
@@ -274,7 +289,8 @@ var todo = {
                 var self = this,
                     div = document.createElement("DIV");
                 div.classList.add("subCat");
-                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; <span class='subCat_string'>" + self.name + "</span> （<span class='assignNum'>" + self.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
+                div.setAttribute("data-string", self.name);
+                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + self.name + " （<span class='assignNum'>" + self.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
                 node.appendChild(div);
                 // node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
                 //选中子分类样式
@@ -282,10 +298,8 @@ var todo = {
                     todo.traverseClassNode(["subCat"], function (x) {
                         x.classList.remove("chosen");
                     });
-                    // todo.chosenSubtitle = e.currentTarget.getAttribute("data-index");
-                    todo.chosenSubtitle = self.name;
-                    todo.chosenCategory = node.getAttribute("data-category");
-                    // alert(todo.chosenCategory + "+" + todo.chosenSubtitle);
+                    todo.chosenSubtitle = div;
+                    todo.chosenCategory = node;
                     e.currentTarget.classList.add("chosen");
 
                     //TODO:中栏显示该分类的任务
@@ -299,7 +313,7 @@ var todo = {
 
                 //数据存储
                 if (addItem) {
-                    self.addItemToArr(this.name, node.getAttribute("data-category"));
+                    todo.addItemToArr(this.name, node.getAttribute("data-category"));
                 }
             },
             /** 添加主分类 */
@@ -341,7 +355,8 @@ var todo = {
                 arr_name = arr;
             } else {
                 var str = localStorage.getItem("name");
-                arr_name = eval('(' + str + ')');
+                arr_name = JSON.parse(str);
+                // arr_name = eval('(' + str + ')');
             }
             self.clearData();
             // var sub = localStorage.getItem(arr_name[0]);
@@ -452,20 +467,22 @@ var todo = {
     addItemToArr: function (item, arrName) {
         var str = localStorage.getItem(arrName);
         if (str) {
-            // var arr = JSON.parse(str);
-            var arr = eval('(' + str + ')');
+            var arr = JSON.parse(str);
+            // var arr = eval('(' + str + ')');
             if (!arr.includes(item)) {
                 arr.push(item);
                 localStorage.setItem(arrName, JSON.stringify(arr));
             }
         } else {
-            localStorage.setItem(arrName, '[' + item + ']');
+            var arr = [];
+            arr.push(item);
+            localStorage.setItem(arrName, JSON.stringify(arr));
         }
     },
     removeItem: function (item, arrName) {
         var str = localStorage.getItem(arrName);
         if (str) {
-            var arr = eval('(' + str + ')'),
+            var arr = JSON.parse(str),
                 index = arr.indexOf(item);
             if (index != -1) {
                 arr.splice(index, 1);
