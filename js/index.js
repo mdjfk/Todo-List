@@ -7,15 +7,43 @@ var todo = {
     init: function () {
         var self = this;
         // localStorage.clear();
+
+        //左栏点击事件
+        self.getByClass("leftArea")[0].addEventListener("click", function (e) {
+            var target = e.target;
+            if (target.nodeType === 1) {
+                switch (true) {
+                    //删除图标点击
+                    case target.className.indexOf("trashIcon") != -1:
+                        if (target.parentNode.className.indexOf("mainCat") != -1) {
+                            self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete);
+                        } else if (target.parentNode.className.indexOf("subCat") != -1) {
+                            self.filterAssignment(null, target.getAttribute("data-string"), self.assignmentType, self.delete);
+                        }
+
+                        break;
+                        //新增分类点击
+                    case target.className.indexOf("addItem") != -1:
+                        self.getByClass("popWindow")[0].style.display = "inline";
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        });
+        //中栏点击事件
+        //右栏点击事件
+
         //所有分类
         self.getById("allAssignments").addEventListener("click", function () {
             self.setFilter(0);
             self.showAllAssignment();
         });
         //新增分类按钮
-        self.getById("addCat").addEventListener("click", function () {
-            self.getByClass("popWindow")[0].style.display = "inline";
-        }, false);
+        // self.getById("addCat").addEventListener("click", function () {
+        //     self.getByClass("popWindow")[0].style.display = "inline";
+        // }, false);
 
         //新增任务按钮
         self.getById("addAssign").addEventListener("click", function () {
@@ -167,7 +195,7 @@ var todo = {
 
                     //显示所有任务（显示该分类下所有任务）
                     self.showAllAssignment();
-                    self.filterAssignment(null, self.chosenSubtitle.getAttribute("data-string"), 0);
+                    self.filterAssignment(null, self.chosenSubtitle.getAttribute("data-string"), 0, self.hide);
 
 
 
@@ -298,9 +326,9 @@ var todo = {
                     todo.chosenCategory = node;
                     e.currentTarget.classList.add("chosen");
 
-                    //TODO:中栏显示该分类的任务
+                    //中栏显示该分类的任务
                     todo.showAllAssignment();
-                    todo.filterAssignment(null, self.name, todo.assignmentType);
+                    todo.filterAssignment(null, self.name, todo.assignmentType, todo.hide);
 
                 }, false);
                 //显示及隐藏删除图标
@@ -518,14 +546,17 @@ var todo = {
     hide: function (node) {
         node.classList.add("hide");
     },
+    delete: function (node) {
+        node.remove();
+    },
     showAllAssignment: function () {
         var self = this;
         self.traverseClassNode(["dateGroup", "titleGroup"], function (node) {
             node.classList.remove("hide");
         });
     },
-
-    filterAssignment: function (main, sub, status) {
+    //_delete(optional): delete node->1 otherwise don't designate this arg
+    filterAssignment: function (main, sub, status, func, _delete) {
         var self = this;
         self.traverseClassNode(["dateGroup"], function (node) {
             // let assignments = node.querySelectorAll("titleGroup"),
@@ -552,14 +583,24 @@ var todo = {
 
                 }
                 if (flag) {
-                    self.hide(assignments[i]);
+                    func(assignments[i]);
+                    // self.hide(assignments[i]);
+                    if (_delete) {
+                        let arr = JSON.parse(localStorage.getItem(node.getAttribute("data-deadline")));
+                        self.removeItem(assignments[i].getAttribute("data-assignIndex"), arr);
+                    }
                     hideCount++;
                 }
 
             }
 
             if (assignmentNum === hideCount) {
-                self.hide(node);
+                func(node);
+                // self.hide(node);
+                if (_delete) {
+                    let arr = JSON.parse(localStorage.getItem("data"));
+                    self.removeItem(node.getAttribute("data-deadline"), arr);
+                }
             }
 
         });
