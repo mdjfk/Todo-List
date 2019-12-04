@@ -18,7 +18,7 @@ var todo = {
                         if (target.parentNode.className.indexOf("mainCat") != -1) {
                             self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete);
                         } else if (target.parentNode.className.indexOf("subCat") != -1) {
-                            self.filterAssignment(null, target.getAttribute("data-string"), self.assignmentType, self.delete);
+                            self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete);
                         }
 
                         break;
@@ -556,6 +556,7 @@ var todo = {
         });
     },
     //_delete(optional): delete node->1 otherwise don't designate this arg
+    //TODO: 点击分类：显示所有的任务，然后不符合选中条件的隐藏，删除分类：所有符合条件的要删除，所以这个筛选是反的
     filterAssignment: function (main, sub, status, func, _delete) {
         var self = this;
         self.traverseClassNode(["dateGroup"], function (node) {
@@ -586,8 +587,9 @@ var todo = {
                     func(assignments[i]);
                     // self.hide(assignments[i]);
                     if (_delete) {
-                        let arr = JSON.parse(localStorage.getItem(node.getAttribute("data-deadline")));
-                        self.removeItem(assignments[i].getAttribute("data-assignIndex"), arr);
+                        // let arr = JSON.parse(localStorage.getItem(node.getAttribute("data-deadline")));
+                        //TODO: arr is null???
+                        self.removeItem(assignments[i].getAttribute("data-assignIndex"), JSON.parse(localStorage.getItem(node.getAttribute("data-deadline"))));
                     }
                     hideCount++;
                 }
