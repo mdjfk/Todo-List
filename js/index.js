@@ -17,8 +17,11 @@ var todo = {
                     case target.className.indexOf("trashIcon") != -1:
                         if (target.parentNode.className.indexOf("mainCat") != -1) {
                             self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete, 1);
+                            //TODO: 删除这个主分类，更新总未完成任务数
+
                         } else if (target.parentNode.className.indexOf("subCat") != -1) {
                             self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete, 1);
+                            //TODO: 删除这个子分类，更新所在主分类的未完成任务数，更新总未完成任务数
                         }
 
                         break;
@@ -201,7 +204,7 @@ var todo = {
 
                     //更新存储日期
                     self.addItemToArr(date, "date");
-                    self.addItemToArr(self.assignIndex, date);
+                    self.addItemToArr(self.assignIndex + "", date);
                     localStorage.setItem(self.assignIndex + "main", self.chosenCategory.getAttribute("data-category"));
                     localStorage.setItem(self.assignIndex + "sub", self.chosenSubtitle.getAttribute("data-string"));
                     localStorage.setItem(self.assignIndex + "status", 1);
@@ -520,7 +523,7 @@ var todo = {
             localStorage.setItem(arrName, JSON.stringify(arr));
         }
     },
-    //TODO:index == -1？ arr = ["1"] or [1]
+
     removeItem: function (item, arrName) {
         var str = localStorage.getItem(arrName);
         if (str) {
@@ -599,17 +602,6 @@ var todo = {
 
                     }
                 }
-
-                // if (flag) {
-                //     func(assignments[i]);
-                //     // self.hide(assignments[i]);
-                //     if (_delete) {
-                //         // let arr = JSON.parse(localStorage.getItem(node.getAttribute("data-deadline")));
-                //         //TODO: arr is null???
-                //         self.removeItem(assignments[i].getAttribute("data-assignIndex"), JSON.parse(localStorage.getItem(node.getAttribute("data-deadline"))));
-                //     }
-                //     hideCount++;
-                // }
 
             }
 
