@@ -16,9 +16,9 @@ var todo = {
                     //删除图标点击
                     case target.className.indexOf("trashIcon") != -1:
                         if (target.parentNode.className.indexOf("mainCat") != -1) {
-                            self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete);
+                            self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete, 1);
                         } else if (target.parentNode.className.indexOf("subCat") != -1) {
-                            self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete);
+                            self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete, 1);
                         }
 
                         break;
@@ -520,6 +520,7 @@ var todo = {
             localStorage.setItem(arrName, JSON.stringify(arr));
         }
     },
+    //TODO:index == -1？ arr = ["1"] or [1]
     removeItem: function (item, arrName) {
         var str = localStorage.getItem(arrName);
         if (str) {
@@ -583,26 +584,41 @@ var todo = {
                     }
 
                 }
-                if (flag) {
-                    func(assignments[i]);
-                    // self.hide(assignments[i]);
-                    if (_delete) {
-                        // let arr = JSON.parse(localStorage.getItem(node.getAttribute("data-deadline")));
-                        //TODO: arr is null???
-                        self.removeItem(assignments[i].getAttribute("data-assignIndex"), JSON.parse(localStorage.getItem(node.getAttribute("data-deadline"))));
+
+                if (_delete) {
+                    if (!flag) {
+                        self.removeItem(assignments[i].getAttribute("data-assignIndex"), node.getAttribute("data-deadline"));
+                        func(assignments[i]);
+                        hideCount++;
+
                     }
-                    hideCount++;
+                } else {
+                    if (flag) {
+                        func(assignments[i]);
+                        hideCount++;
+
+                    }
                 }
+
+                // if (flag) {
+                //     func(assignments[i]);
+                //     // self.hide(assignments[i]);
+                //     if (_delete) {
+                //         // let arr = JSON.parse(localStorage.getItem(node.getAttribute("data-deadline")));
+                //         //TODO: arr is null???
+                //         self.removeItem(assignments[i].getAttribute("data-assignIndex"), JSON.parse(localStorage.getItem(node.getAttribute("data-deadline"))));
+                //     }
+                //     hideCount++;
+                // }
 
             }
 
             if (assignmentNum === hideCount) {
-                func(node);
                 // self.hide(node);
                 if (_delete) {
-                    let arr = JSON.parse(localStorage.getItem("data"));
-                    self.removeItem(node.getAttribute("data-deadline"), arr);
+                    self.removeItem(node.getAttribute("data-deadline"), "date");
                 }
+                func(node);
             }
 
         });
