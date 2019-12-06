@@ -18,10 +18,16 @@ var todo = {
                         if (target.parentNode.className.indexOf("mainCat") != -1) {
                             self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete, 1);
                             //TODO: 删除这个主分类，更新总未完成任务数
+                            var numNode3 = self.getById("assignNum");
+                            numNode3.innerHTML = parseInt(numNode3.innerHTML) - parseInt(target.previousElementSibling.innerHTML);
+                            //存储localStorage
+                            localStorage.setItem("totalUnfinished", numNode3.innerHTML);
 
+                            target.parentNode.parentNode.remove();
                         } else if (target.parentNode.className.indexOf("subCat") != -1) {
                             self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete, 1);
                             //TODO: 删除这个子分类，更新所在主分类的未完成任务数，更新总未完成任务数
+
                         }
 
                         break;
@@ -531,7 +537,11 @@ var todo = {
                 index = arr.indexOf(item);
             if (index != -1) {
                 arr.splice(index, 1);
-                localStorage.setItem(arrName, JSON.stringify(arr));
+                if (arr.length) {
+                    localStorage.setItem(arrName, JSON.stringify(arr));
+                } else {
+                    localStorage.removeItem(arrName);
+                }
             }
         } else {
             alert("The arrName designated doesn't exist!");
