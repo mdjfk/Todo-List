@@ -17,17 +17,37 @@ var todo = {
                     case target.className.indexOf("trashIcon") != -1:
                         if (target.parentNode.className.indexOf("mainCat") != -1) {
                             self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete, 1);
-                            //TODO: 删除这个主分类，更新总未完成任务数
-                            var numNode3 = self.getById("assignNum");
-                            numNode3.innerHTML = parseInt(numNode3.innerHTML) - parseInt(target.previousElementSibling.innerHTML);
+                            //删除这个主分类，更新总未完成任务数
+                            var numNode = self.getById("assignNum");
+                            numNode.innerHTML = parseInt(numNode.innerHTML) - parseInt(target.previousElementSibling.innerHTML);
                             //存储localStorage
-                            localStorage.setItem("totalUnfinished", numNode3.innerHTML);
+                            localStorage.setItem("totalUnfinished", numNode.innerHTML);
+                            localStorage.removeItem("unfinished" + target.parentNode.parentNode.getAttribute("data-category"));
+                            localStorage.removeItem(target.parentNode.parentNode.getAttribute("data-category"));
+                            self.removeItem(target.parentNode.parentNode.getAttribute("data-category"), "name");
+
+                            let sub = target.parentNode.parentNode.querySelectorAll(".subCat");
+                            for (let i = 0, len = sub.length; i < len; i++) {
+                                localStorage.removeItem("unfinished" + target.parentNode.parentNode.getAttribute("data-category") + sub[i].getAttribute("data-string"));
+                            }
 
                             target.parentNode.parentNode.remove();
+
                         } else if (target.parentNode.className.indexOf("subCat") != -1) {
                             self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete, 1);
-                            //TODO: 删除这个子分类，更新所在主分类的未完成任务数，更新总未完成任务数
+                            //删除这个子分类，更新所在主分类的未完成任务数，更新总未完成任务数
+                            var numNode = target.parentNode.parentNode.querySelector(".assignNum");
+                            numNode.innerHTML = parseInt(numNode.innerHTML) - parseInt(target.previousElementSibling.innerHTML);
+                            var numNode2 = self.getById("assignNum");
+                            numNode2.innerHTML = parseInt(numNode2.innerHTML) - parseInt(target.previousElementSibling.innerHTML);
+                            //存储localStorage
+                            localStorage.setItem("unfinished" + target.parentNode.parentNode.getAttribute("data-category"), numNode.innerHTML);
+                            localStorage.setItem("totalUnfinished", numNode2.innerHTML);
+                            localStorage.removeItem("unfinished" + target.parentNode.parentNode.getAttribute("data-category") + target.parentNode.getAttribute("data-string"));
 
+                            self.removeItem(target.parentNode.getAttribute("data-string"), target.parentNode.parentNode.getAttribute("data-category"));
+
+                            target.parentNode.remove();
                         }
 
                         break;
@@ -67,6 +87,9 @@ var todo = {
                 //右上按钮变为 取消编辑和完成编辑
                 self.getByClass("titleIcon")[0].classList.toggle("hide");
                 self.getByClass("titleIcon")[1].classList.toggle("hide");
+
+                //focus on title input
+                self.getById("assTitle").focus();
             } else {
                 alert('Please choose a subCategory before adding an assignment');
             }
@@ -580,18 +603,19 @@ var todo = {
                 hideCount = 0,
                 flag = 0;
             for (let i = 0; i < assignmentNum; i++) {
+                let assignIndex = assignments[i].getAttribute("data-assignIndex");
                 if (main) {
-                    if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "main") != main) {
+                    if (localStorage.getItem(assignIndex + "main") != main) {
                         flag = 1;
                     }
                 } else {
                     if (sub) {
-                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "sub") != sub) {
+                        if (localStorage.getItem(assignIndex + "sub") != sub) {
                             flag = 1;
                         }
                     }
                     if (status) {
-                        if (localStorage.getItem(assignments[i].getAttribute("data-assignIndex") + "status") != status) {
+                        if (localStorage.getItem(assignIndex + "status") != status) {
                             flag = 1;
                         }
                     }
@@ -600,7 +624,12 @@ var todo = {
 
                 if (_delete) {
                     if (!flag) {
-                        self.removeItem(assignments[i].getAttribute("data-assignIndex"), node.getAttribute("data-deadline"));
+                        self.removeItem(assignIndex, node.getAttribute("data-deadline"));
+                        localStorage.removeItem(assignIndex + "main");
+                        localStorage.removeItem(assignIndex + "status");
+                        localStorage.removeItem(assignIndex + "sub");
+                        localStorage.removeItem("Index" + assignIndex);
+
                         func(assignments[i]);
                         hideCount++;
 
