@@ -51,7 +51,7 @@ var todo = {
                         }
 
                         break;
-                        //新增分类点击
+                        //新增分类点击响应
                     case target.className.indexOf("addItem") != -1:
                         self.getByClass("popWindow")[0].style.display = "inline";
                         break;
@@ -61,6 +61,8 @@ var todo = {
                 }
             }
         });
+        //TODO:左栏hover事件响应
+
         //中栏点击事件
         //右栏点击事件
 
@@ -69,10 +71,6 @@ var todo = {
             self.setFilter(0);
             self.showAllAssignment();
         });
-        //新增分类按钮
-        // self.getById("addCat").addEventListener("click", function () {
-        //     self.getByClass("popWindow")[0].style.display = "inline";
-        // }, false);
 
         //新增任务按钮
         self.getById("addAssign").addEventListener("click", function () {
@@ -230,7 +228,6 @@ var todo = {
                     self.filterAssignment(null, self.chosenSubtitle.getAttribute("data-string"), 0, self.hide);
 
 
-
                     //更新存储日期
                     self.addItemToArr(date, "date");
                     self.addItemToArr(self.assignIndex + "", date);
@@ -240,28 +237,12 @@ var todo = {
 
                     //新建一个任务，并将新增的任务设为选中任务
                     var assign = self.newAssignment(0, title);
-
-                    // var assign = document.createElement("DIV");
-                    // assign.classList.add("titleGroup");
-                    // assign.setAttribute("data-status", "0");
-                    // assign.setAttribute("data-assignIndex", self.assignIndex++);
-                    // localStorage.setItem("assignIndex", self.assignIndex);
-                    // assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
-
                     self.chosenAssign = assign; //新增的任务成为选中任务
-
 
                     //任务新增在任务栏中
                     for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
                         if (subDiv.getAttribute("data-deadline") > date) { //新增任务日期比所有已存在日期都小
                             self.addAssignmentDOM(parentNode, subDiv, date, assign);
-
-                            // var fragment = document.createElement("DIV");
-                            // fragment.classList.add("dateGroup");
-                            // fragment.setAttribute("data-deadline", date);
-                            // fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
-                            // fragment.appendChild(assign);
-                            // parentNode.insertBefore(fragment, subDiv);
                             added = true;
                             break;
                         } else if (subDiv.getAttribute("data-deadline") === date) { //已存在该日期分类
@@ -274,12 +255,6 @@ var todo = {
                             subDiv.appendChild(assign);
                         } else { //新增任务日期比所有已存在日期都大，添加到最末尾
                             self.addAssignmentDOM(parentNode, subDiv, date, assign);
-                            // var fragment = document.createElement("DIV");
-                            // fragment.classList.add("dateGroup");
-                            // fragment.setAttribute("data-deadline", date);
-                            // fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
-                            // fragment.appendChild(assign);
-                            // parentNode.appendChild(fragment, subDiv);
                         }
                     }
 
@@ -365,7 +340,6 @@ var todo = {
                 }, false);
                 //显示及隐藏删除图标
                 toggleTrashIcon(div);
-                //TODO:删除图标点击响应——视图上删除该分类，任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？不会）
 
                 //数据存储
                 if (addItem) {
@@ -389,13 +363,10 @@ var todo = {
                 self.getById("subCat").innerHTML += "<option value='" + this.name + "'>" + this.name + "</option>";
                 //显示及隐藏删除图标
                 toggleTrashIcon(mainCat);
-                //TODO:删除图标点击响应——视图上删除该分类（及其子分类），任务列表中属于该分类的删除，数据清除（被删除元素所绑定的事件会自动删除吗？）
-                // self.filterAssignment(main, sub, status);
 
                 if (addItem) {
                     //数据存储
                     self.addItemToArr(this.name, "name");
-
                 }
                 return cat;
             }
@@ -593,7 +564,7 @@ var todo = {
         });
     },
     //_delete(optional): delete node->1 otherwise don't designate this arg
-    //TODO: 点击分类：显示所有的任务，然后不符合选中条件的隐藏，删除分类：所有符合条件的要删除，所以这个筛选是反的
+    //点击分类：显示所有的任务，然后不符合选中条件的隐藏，删除分类：所有符合条件的要删除，所以这个筛选是反的
     filterAssignment: function (main, sub, status, func, _delete) {
         var self = this;
         self.traverseClassNode(["dateGroup"], function (node) {
