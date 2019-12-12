@@ -55,7 +55,11 @@ var todo = {
                     case target.className.indexOf("addItem") != -1:
                         self.getByClass("popWindow")[0].style.display = "inline";
                         break;
-
+                        //所有分类点击响应
+                    case target.id == "allAssignments":
+                        self.setFilter(0);
+                        self.showAllAssignment();
+                        break;
                     default:
                         break;
                 }
@@ -64,35 +68,38 @@ var todo = {
         //TODO:左栏hover事件响应
 
         //中栏点击事件
-        //右栏点击事件
+        self.getByClass("middleArea")[0].addEventListener("click", function (e) {
+            var target = e.target;
+            if (target.nodeType === 1) {
+                switch (true) {
+                    //新增任务按钮
+                    case target.id == "addAssign":
+                        self.addAssignmentBtn();
+                        break;
 
-        //所有分类
-        self.getById("allAssignments").addEventListener("click", function () {
-            self.setFilter(0);
-            self.showAllAssignment();
-        });
+                    default:
+                        break;
+                }
 
-        //新增任务按钮
-        self.getById("addAssign").addEventListener("click", function () {
-            //if 选中分类
-            if (self.chosenSubtitle) {
-                self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
-                self.getById("content").innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
-                self.getById("inputDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
-
-                //新建任务时，chosenAssign设为没有任务被选中
-                self.chosenAssign = null;
-                //右上按钮变为 取消编辑和完成编辑
-                self.getByClass("titleIcon")[0].classList.toggle("hide");
-                self.getByClass("titleIcon")[1].classList.toggle("hide");
-
-                //focus on title input
-                self.getById("assTitle").focus();
-            } else {
-                alert('Please choose a subCategory before adding an assignment');
             }
 
-        }, false);
+        });
+        //右栏点击事件
+        // self.getByClass("rightArea")[0].addEventListener("click", function (e) {
+        //     var target = e.target;
+        //     if (target.nodeType === 1) {
+        //         switch (true) {
+        //             case value:
+
+        //                 break;
+
+        //             default:
+        //                 break;
+        //         }
+
+        //     }
+
+        // });
 
         //弹窗 取消按钮
         self.getById("btnCancel").addEventListener("click", function () {
@@ -416,7 +423,7 @@ var todo = {
                     let eachDate = JSON.parse(localStorage.getItem(dateArr[i]));
                     for (let j = 0, len = eachDate.length; j < len; j++) {
                         let oneAssignment = JSON.parse(localStorage.getItem("Index" + eachDate[j])),
-                            assign = self.newAssignment(0, oneAssignment.title);
+                            assign = self.newAssignment2(0, oneAssignment.title, eachDate[j]);
                         self.addAssignmentDOM(self.getByClass("middleItem")[0], null, dateArr[i], assign);
                     }
 
@@ -678,6 +685,36 @@ var todo = {
         localStorage.setItem("assignIndex", self.assignIndex);
         assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
         return assign;
+    },
+    newAssignment2: function (status, title, assignIndex) {
+        //新建一个任务
+        var self = this,
+            assign = document.createElement("DIV");
+        assign.classList.add("titleGroup");
+        assign.setAttribute("data-status", status);
+        assign.setAttribute("data-assignIndex", assignIndex);
+        assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
+        return assign;
+    },
+    //新建任务
+    addAssignmentBtn: function () {
+        var self = this;
+        if (self.chosenSubtitle) {
+            self.getById("assignTitle").innerHTML = "<input type='text' class='inputTitle' placeholder='Please input a title' id='assTitle'>";
+            self.getById("content").innerHTML = "<input type='text' class='inputContent' placeholder='Please input some content' id='assContent'>";
+            self.getById("inputDate").innerHTML = "<input type='date' name='deadline' id='deadline'>";
+
+            //新建任务时，chosenAssign设为没有任务被选中
+            self.chosenAssign = null;
+            //右上按钮变为 取消编辑和完成编辑
+            self.getByClass("titleIcon")[0].classList.toggle("hide");
+            self.getByClass("titleIcon")[1].classList.toggle("hide");
+
+            //focus on title input
+            self.getById("assTitle").focus();
+        } else {
+            alert('Please choose a subCategory before adding an assignment');
+        }
     }
 
 
