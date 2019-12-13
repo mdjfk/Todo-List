@@ -266,3 +266,7 @@ body {
     background-color: rgb(255, 241, 241);
     cursor: pointer;
 }
+
+.float_right {
+    float: right;
+}

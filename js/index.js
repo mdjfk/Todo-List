@@ -76,7 +76,14 @@ var todo = {
                     case target.id == "addAssign":
                         self.addAssignmentBtn();
                         break;
-
+                        //任务点击
+                    case target.className.indexOf("theTitle") != -1 || target.className.indexOf("glyphicon-ok") != -1:
+                        target = target.parentNode;
+                    case target.className.indexOf("titleGroup") != -1:
+                        self.assignmentClick(target);
+                        break;
+                        // case :
+                        // break;
                     default:
                         break;
                 }
@@ -85,123 +92,188 @@ var todo = {
 
         });
         //右栏点击事件
-        // self.getByClass("rightArea")[0].addEventListener("click", function (e) {
-        //     var target = e.target;
-        //     if (target.nodeType === 1) {
-        //         switch (true) {
-        //             case value:
+        self.getByClass("rightArea")[0].addEventListener("click", function (e) {
+            var target = e.target;
+            if (target.nodeType === 1) {
+                switch (true) {
+                    //任务完成按钮
+                    case target.className.indexOf("glyphicon-check") != -1:
+                        (function () {
+                            //对应任务title显示完成标签 如何找到对应任务？ 用chosenAssign存储被选中的任务
+                            var assignment = self.chosenAssign;
+                            if (assignment) { //选中了一个任务
+                                if (parseInt(assignment.getAttribute("data-status")) === 0) { //如果该任务未完成（data-status为0）
+                                    if (window.confirm("Do you really want to finish this assignment?")) {
+                                        assignment.innerHTML += "<div style='float: right;'><span class='glyphicon glyphicon-ok'></span></div>";
+                                        assignment.setAttribute("data-status", "1");
+                                        localStorage.setItem(assignment.getAttribute("data-assignIndex") + "status", "");
+                                        self.setUnfinished(-1, assignment);
+                                    }
 
-        //                 break;
+                                } else { //如果该任务已完成
+                                    alert('The assignment has been finished!');
+                                }
+                            } else {
+                                alert('Please choose an assignment first!');
+                            }
 
-        //             default:
-        //                 break;
-        //         }
+                        })();
+                        break;
+                        //编辑任务按钮
+                    case target.className.indexOf("glyphicon-edit") != -1:
+                        (function () {
+                            if (self.chosenAssign) { //选中了一个任务
+                                //现有内容放入编辑框，可以编辑
+                                var assignTitle = self.getById("assignTitle"),
+                                    inputDate = self.getById("inputDate"),
+                                    contentContainer = self.getById("content");
+                                assignTitle.innerHTML = "<input type='text' class='inputTitle' value=" + assignTitle.innerHTML + " id='assTitle'>";
+                                inputDate.innerHTML = "<input type='date' name='deadline' id='deadline' value=" + inputDate.innerHTML + " >";
+                                contentContainer.innerHTML = "<input type='text' class='inputContent' value=" + contentContainer.innerHTML + " id='assContent'>";
 
+                                //右上按钮变为 取消编辑和完成编辑
+                                self.getByClass("titleIcon")[0].classList.toggle("hide");
+                                self.getByClass("titleIcon")[1].classList.toggle("hide");
+                            } else {
+                                alert('Please choose an assignment first!');
+                            }
+
+                        })();
+                        break;
+                        //取消编辑按钮
+                    case target.className.indexOf("glyphicon-remove") != -1:
+                        (function () {
+                            var index = self.chosenAssign,
+                                assignTitle = self.getById("assignTitle"),
+                                inputDate = self.getById("inputDate"),
+                                contentContainer = self.getById("content");
+                            if (index) { //非新建任务，显示chosenAssign的任务信息
+                                var obj = JSON.parse(localStorage.getItem("Index" + index.getAttribute("data-assignIndex")));
+                                assignTitle.innerHTML = obj.title;
+                                inputDate.innerHTML = obj.date;
+                                contentContainer.innerHTML = obj.content;
+                            } else { //新建任务，信息清空
+                                assignTitle.innerHTML = "";
+                                inputDate.innerHTML = "";
+                                contentContainer.innerHTML = "";
+                            }
+
+                            //右上按钮变为 完成和编辑按钮
+                            self.getByClass("titleIcon")[0].classList.toggle("hide");
+                            self.getByClass("titleIcon")[1].classList.toggle("hide");
+                        })();
+                        break;
+
+                    default:
+                        break;
+                }
+
+            }
+
+        });
+
+
+        //编辑任务按钮
+        // self.getByClass("glyphicon-edit")[0].addEventListener("click", function () {
+        //     if (self.chosenAssign) { //选中了一个任务
+        //         //现有内容放入编辑框，可以编辑
+        //         var assignTitle = self.getById("assignTitle"),
+        //             inputDate = self.getById("inputDate"),
+        //             contentContainer = self.getById("content");
+        //         assignTitle.innerHTML = "<input type='text' class='inputTitle' value=" + assignTitle.innerHTML + " id='assTitle'>";
+        //         inputDate.innerHTML = "<input type='date' name='deadline' id='deadline' value=" + inputDate.innerHTML + " >";
+        //         contentContainer.innerHTML = "<input type='text' class='inputContent' value=" + contentContainer.innerHTML + " id='assContent'>";
+
+        //         //右上按钮变为 取消编辑和完成编辑
+        //         self.getByClass("titleIcon")[0].classList.toggle("hide");
+        //         self.getByClass("titleIcon")[1].classList.toggle("hide");
+        //     } else {
+        //         alert('Please choose an assignment first!');
         //     }
 
         // });
 
-        //弹窗 取消按钮
-        self.getById("btnCancel").addEventListener("click", function () {
-            self.getByClass("popWindow")[0].style.display = "none";
-            self.getById("addName").value = "";
-            self.getById("subCat").options[0].selected = true;
-        }, false);
+        // //取消编辑按钮
+        // self.getByClass("glyphicon-remove")[0].addEventListener("click", function () {
+        //     var index = self.chosenAssign,
+        //         assignTitle = self.getById("assignTitle"),
+        //         inputDate = self.getById("inputDate"),
+        //         contentContainer = self.getById("content");
+        //     if (index) { //非新建任务，显示chosenAssign的任务信息
+        //         var obj = JSON.parse(localStorage.getItem("Index" + index.getAttribute("data-assignIndex")));
+        //         assignTitle.innerHTML = obj.title;
+        //         inputDate.innerHTML = obj.date;
+        //         contentContainer.innerHTML = obj.content;
+        //     } else { //新建任务，右边信息清空
+        //         assignTitle.innerHTML = "";
+        //         inputDate.innerHTML = "";
+        //         contentContainer.innerHTML = "";
+        //     }
 
-        //弹窗 确认按钮
-        self.getById("btnConfirm").addEventListener("click", function () {
-            var select = self.getById("subCat"),
-                selectValue = select.options[select.selectedIndex].value,
-                newName = self.getById("addName").value;
-            if (newName) {
-                if (selectValue === "newCategory") {
-                    //新建主分类
-                    var cat = new Category(newName);
-                    cat.addCat();
-                } else {
-                    //新建子分类
-                    var nodes = self.getByClass("category"),
-                        len = nodes.length;
-                    for (let i = 0; i < len; i++) {
-                        var a = nodes[i].getAttribute("data-category");
-                        if (a === selectValue) {
-                            var subCat = new Category(newName);
-                            subCat.addSub(nodes[i]);
-                        }
+        //     //右上按钮变为 完成和编辑按钮
+        //     self.getByClass("titleIcon")[0].classList.toggle("hide");
+        //     self.getByClass("titleIcon")[1].classList.toggle("hide");
+        // });
 
-                    }
+
+
+
+        //弹窗点击事件
+        self.getByClass("popWindow")[0].addEventListener("click", function (e) {
+            var target = e.target;
+            if (target.nodeName === "BUTTON") {
+                switch (true) {
+                    //弹窗 确认按钮
+                    case target.id === "btnConfirm":
+                        (function () {
+                            var select = self.getById("subCat"),
+                                selectValue = select.options[select.selectedIndex].value,
+                                newName = self.getById("addName").value;
+                            if (newName) {
+                                if (selectValue === "newCategory") {
+                                    //新建主分类
+                                    var cat = new Category(newName);
+                                    cat.addCat();
+                                } else {
+                                    //新建子分类
+                                    var nodes = self.getByClass("category"),
+                                        len = nodes.length;
+                                    for (let i = 0; i < len; i++) {
+                                        var a = nodes[i].getAttribute("data-category");
+                                        if (a === selectValue) {
+                                            var subCat = new Category(newName);
+                                            subCat.addSub(nodes[i]);
+                                        }
+                                    }
+                                }
+                                self.getByClass("popWindow")[0].style.display = "none";
+                                self.getById("addName").value = "";
+                                select.options[0].selected = true;
+                            } else {
+                                alert("Please input the name of the new category!");
+                            }
+
+                        })();
+                        break;
+                        //弹窗 取消按钮
+                    case target.id === "btnCancel":
+                        (function () {
+                            self.getByClass("popWindow")[0].style.display = "none";
+                            self.getById("addName").value = "";
+                            self.getById("subCat").options[0].selected = true;
+                        })();
+                        break;
+                    default:
+                        break;
                 }
-                self.getByClass("popWindow")[0].style.display = "none";
-                self.getById("addName").value = "";
-                select.options[0].selected = true;
-            } else {
-                alert("Please input the name of the new category!");
-            }
 
-        }, false);
-
-        //任务完成按钮
-        self.getByClass("glyphicon-check")[0].addEventListener("click", function () {
-            //对应任务title显示完成标签 如何找到对应任务？ 用chosenAssign存储被选中的任务
-            var assignment = self.chosenAssign;
-            if (assignment) { //选中了一个任务
-                if (parseInt(assignment.getAttribute("data-status")) === 0) { //如果该任务未完成（data-status为0）
-                    if (window.confirm("Do you really want to finish this assignment?")) {
-                        assignment.innerHTML += "<div style='float: right;'><span class='glyphicon glyphicon-ok'></span></div>";
-                        assignment.setAttribute("data-status", "1");
-                        self.setUnfinished(-1);
-                    }
-
-                } else { //如果该任务已完成
-                    alert('The assignment has been finished!');
-                }
-            } else {
-                alert('Please choose an assignment first!');
             }
 
         });
 
-        //编辑任务按钮
-        self.getByClass("glyphicon-edit")[0].addEventListener("click", function () {
-            if (self.chosenAssign) { //选中了一个任务
-                //现有内容放入编辑框，可以编辑
-                var assignTitle = self.getById("assignTitle"),
-                    inputDate = self.getById("inputDate"),
-                    contentContainer = self.getById("content");
-                assignTitle.innerHTML = "<input type='text' class='inputTitle' value=" + assignTitle.innerHTML + " id='assTitle'>";
-                inputDate.innerHTML = "<input type='date' name='deadline' id='deadline' value=" + inputDate.innerHTML + " >";
-                contentContainer.innerHTML = "<input type='text' class='inputContent' value=" + contentContainer.innerHTML + " id='assContent'>";
 
-                //右上按钮变为 取消编辑和完成编辑
-                self.getByClass("titleIcon")[0].classList.toggle("hide");
-                self.getByClass("titleIcon")[1].classList.toggle("hide");
-            } else {
-                alert('Please choose an assignment first!');
-            }
 
-        });
 
-        //取消编辑按钮
-        self.getByClass("glyphicon-remove")[0].addEventListener("click", function () {
-            var index = self.chosenAssign,
-                assignTitle = self.getById("assignTitle"),
-                inputDate = self.getById("inputDate"),
-                contentContainer = self.getById("content");
-            if (index) { //非新建任务，显示chosenAssign的任务信息
-                var obj = JSON.parse(localStorage.getItem("Index" + index.getAttribute("data-assignIndex")));
-                assignTitle.innerHTML = obj.title;
-                inputDate.innerHTML = obj.date;
-                contentContainer.innerHTML = obj.content;
-            } else { //新建任务，右边信息清空
-                assignTitle.innerHTML = "";
-                inputDate.innerHTML = "";
-                contentContainer.innerHTML = "";
-            }
-
-            //右上按钮变为 完成和编辑按钮
-            self.getByClass("titleIcon")[0].classList.toggle("hide");
-            self.getByClass("titleIcon")[1].classList.toggle("hide");
-        });
 
         //完成编辑按钮 新增（chosenAssign为0）或修改（chosenAssign不为0）
         self.getById("glyphicon-ok").addEventListener("click", function () {
@@ -266,19 +338,8 @@ var todo = {
                     }
 
                     //设置未完成任务数 加一
-                    self.setUnfinished(1);
+                    self.setUnfinished(1, assign);
 
-                    //添加任务点击响应：显示对应任务内容
-                    assign.addEventListener("click", function (e) {
-                        var target = e.currentTarget,
-                            // title = target.firstElementChild.innerHTML,
-                            index = parseInt(target.getAttribute("data-assignIndex")),
-                            obj = JSON.parse(localStorage.getItem("Index" + index));
-                        assignTitle.innerHTML = obj.title;
-                        inputDate.innerHTML = obj.date;
-                        contentContainer.innerHTML = obj.content;
-                        self.chosenAssign = target;
-                    }, false);
                 } else { //修改
                     var origin = JSON.parse(localStorage.getItem("Index" + self.chosenAssign.getAttribute("data-assignIndex")));
                     if (origin.date > date) { //日期变小了
@@ -645,19 +706,22 @@ var todo = {
         self.assignmentType = type;
     },
     //operation -1 delete/1 add
-    setUnfinished: function (operation) {
-        var self = this;
+    setUnfinished: function (operation, assignment) {
+        var self = this,
+            chosenCategory = self.assignment_to_category(assignment),
+            chosenSubCategory = self.assignment_to_subCategory(assignment);
+
         //主分类未完成任务数加（减）一
-        var numNode1 = self.getByClass("assignNum", self.chosenCategory)[0];
+        var numNode1 = self.getByClass("assignNum", chosenCategory)[0];
         numNode1.innerHTML = parseInt(numNode1.innerHTML) + operation;
         //存储localStorage
-        localStorage.setItem("unfinished" + self.chosenCategory.getAttribute("data-category"), numNode1.innerHTML);
+        localStorage.setItem("unfinished" + chosenCategory.getAttribute("data-category"), numNode1.innerHTML);
 
         //子分类未完成任务数加（减）一
-        var numNode2 = self.getByClass("assignNum", self.chosenSubtitle)[0];
+        var numNode2 = self.getByClass("assignNum", chosenSubCategory)[0];
         numNode2.innerHTML = parseInt(numNode2.innerHTML) + operation;
         //存储localStorage
-        localStorage.setItem("unfinished" + self.chosenCategory.getAttribute("data-category") + self.chosenSubtitle.getAttribute("data-string"), numNode2.innerHTML);
+        localStorage.setItem("unfinished" + chosenCategory.getAttribute("data-category") + chosenSubCategory.getAttribute("data-string"), numNode2.innerHTML);
 
         //所有任务未完成任务数加（减）一
         var numNode3 = self.getById("assignNum");
@@ -715,7 +779,39 @@ var todo = {
         } else {
             alert('Please choose a subCategory before adding an assignment');
         }
-    }
+    },
+    //任务点击响应：显示对应任务内容
+    assignmentClick: function (target) {
+        var self = this,
+            index = parseInt(target.getAttribute("data-assignIndex")),
+            obj = JSON.parse(localStorage.getItem("Index" + index));
+        self.getById("assignTitle").innerHTML = obj.title;
+        self.getById("inputDate").innerHTML = obj.date;
+        self.getById("content").innerHTML = obj.content;
+        self.chosenAssign = target;
 
+    },
+    assignment_to_category: function (obj) {
+        var category = document.querySelectorAll(".category");
+        for (let i = 0, len = category.length; i < len; i++) {
+            if (category[i].getAttribute("data-category") === localStorage.getItem(obj.getAttribute("data-assignIndex") + "main")) {
+                return category[i];
+            }
+        }
+        return null;
+    },
+    assignment_to_subCategory: function (obj) {
+        var self = this,
+            chosenCategory = self.assignment_to_category(obj);
+        if (chosenCategory) {
+            let subCategory = chosenCategory.querySelectorAll(".subCat");
+            for (let i = 0, len = subCategory.length; i < len; i++) {
+                if (subCategory[i].getAttribute("data-string") === localStorage.getItem(obj.getAttribute("data-assignIndex") + "sub")) {
+                    return subCategory[i];
+                }
+            }
+            return null;
+        }
+    }
 
 };
