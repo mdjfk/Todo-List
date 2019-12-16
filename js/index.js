@@ -33,6 +33,10 @@ var todo = {
 
                             target.parentNode.parentNode.remove();
 
+                            //显示所有任务：同点击所有任务的效果
+                            self.setFilter(0);
+                            self.showAllAssignment();
+
                         } else if (target.parentNode.className.indexOf("subCat") != -1) {
                             self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete, 1);
                             //删除这个子分类，更新所在主分类的未完成任务数，更新总未完成任务数
@@ -48,6 +52,10 @@ var todo = {
                             self.removeItem(target.parentNode.getAttribute("data-string"), target.parentNode.parentNode.getAttribute("data-category"));
 
                             target.parentNode.remove();
+
+                            //显示所有任务：同点击所有任务的效果
+                            self.setFilter(0);
+                            self.showAllAssignment();
                         }
 
                         break;
@@ -59,6 +67,12 @@ var todo = {
                     case target.id == "allAssignments":
                         self.setFilter(0);
                         self.showAllAssignment();
+                        self.chosenCategory = null;
+                        self.chosenSubtitle = null;
+                        self.chosenAssign = null;
+                        self.traverseClassNode(["subCat"], function (x) {
+                            x.classList.remove("chosen");
+                        });
                         break;
                     default:
                         break;
@@ -71,6 +85,7 @@ var todo = {
         self.getByClass("middleArea")[0].addEventListener("click", function (e) {
             var target = e.target;
             if (target.nodeType === 1) {
+                let subcat = self.chosenSubtitle ? self.chosenSubtitle.getAttribute("data-string") : null;
                 switch (true) {
                     //新增任务按钮
                     case target.id == "addAssign":
@@ -82,8 +97,21 @@ var todo = {
                     case target.className.indexOf("titleGroup") != -1:
                         self.assignmentClick(target);
                         break;
-                        // case :
-                        // break;
+                    case target.id === "allBtn":
+                        self.setFilter(0);
+                        self.showAllAssignment();
+                        self.filterAssignment(null, subcat, 0, self.hide);
+                        break;
+                    case target.id === "unfinishedBtn":
+                        self.setFilter(1);
+                        self.showAllAssignment();
+                        self.filterAssignment(null, subcat, 0, self.hide);
+                        break;
+                    case target.id === "finishedBtn":
+                        self.setFilter(2);
+                        self.showAllAssignment();
+                        self.filterAssignment(null, subcat, 0, self.hide);
+                        break;
                     default:
                         break;
                 }
@@ -102,11 +130,11 @@ var todo = {
                             //对应任务title显示完成标签 如何找到对应任务？ 用chosenAssign存储被选中的任务
                             var assignment = self.chosenAssign;
                             if (assignment) { //选中了一个任务
-                                if (parseInt(assignment.getAttribute("data-status")) === 0) { //如果该任务未完成（data-status为0）
+                                if (parseInt(assignment.getAttribute("data-status")) === 0) { //如果该任务未完成（data-status为0-未完成，为1-已完成，index + "status"为1-未完成，为2-已完成）
                                     if (window.confirm("Do you really want to finish this assignment?")) {
                                         assignment.innerHTML += "<div style='float: right;'><span class='glyphicon glyphicon-ok'></span></div>";
                                         assignment.setAttribute("data-status", "1");
-                                        localStorage.setItem(assignment.getAttribute("data-assignIndex") + "status", "");
+                                        localStorage.setItem(assignment.getAttribute("data-assignIndex") + "status", 2);
                                         self.setUnfinished(-1, assignment);
                                     }
 
@@ -163,7 +191,92 @@ var todo = {
                             self.getByClass("titleIcon")[1].classList.toggle("hide");
                         })();
                         break;
+                    case target.id === "glyphicon-ok":
+                        (function () {
+                            var date = self.getById("deadline").value,
+                                title = self.getById("assTitle").value,
+                                content = self.getById("assContent").value;
 
+                            if (title && date && content) { //任务标题、deadline、内容不为空
+                                var parentNode = self.getByClass("middleItem")[0],
+                                    assignTitle = self.getById("assignTitle"),
+                                    inputDate = self.getById("inputDate"),
+                                    contentContainer = self.getById("content"),
+                                    added = false;
+                                assignTitle.innerHTML = title;
+                                inputDate.innerHTML = date;
+                                contentContainer.innerHTML = content;
+                                var obj = {
+                                    title: title,
+                                    date: date,
+                                    content: content
+                                };
+
+                                if (self.chosenAssign === null) { //新增
+                                    //任务信息存到本地存储中（title,date,content）以index为索引项，status保存在DOM中
+                                    localStorage.setItem("Index" + self.assignIndex, JSON.stringify(obj)); //title
+                                    //点击提交任务后新任务默认显示在所有任务下（所有标签为选中状态）
+                                    self.setFilter(0);
+
+                                    //显示所有任务（显示该分类下所有任务）
+                                    self.showAllAssignment();
+                                    self.filterAssignment(null, self.chosenSubtitle.getAttribute("data-string"), 0, self.hide);
+
+
+                                    //更新存储日期
+                                    self.addItemToArr(date, "date");
+                                    self.addItemToArr(self.assignIndex + "", date);
+                                    localStorage.setItem(self.assignIndex + "main", self.chosenCategory.getAttribute("data-category"));
+                                    localStorage.setItem(self.assignIndex + "sub", self.chosenSubtitle.getAttribute("data-string"));
+                                    localStorage.setItem(self.assignIndex + "status", 1);
+
+                                    //新建一个任务，并将新增的任务设为选中任务
+                                    var assign = self.newAssignment(0, title);
+                                    self.chosenAssign = assign; //新增的任务成为选中任务
+
+                                    //任务新增在任务栏中
+                                    for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
+                                        if (subDiv.getAttribute("data-deadline") > date) { //新增任务日期比所有已存在日期都小
+                                            self.addAssignmentDOM(parentNode, subDiv, date, assign);
+                                            added = true;
+                                            break;
+                                        } else if (subDiv.getAttribute("data-deadline") === date) { //已存在该日期分类
+                                            break;
+                                        }
+
+                                    }
+                                    if (!added) {
+                                        if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
+                                            subDiv.appendChild(assign);
+                                        } else { //新增任务日期比所有已存在日期都大，添加到最末尾
+                                            self.addAssignmentDOM(parentNode, subDiv, date, assign);
+                                        }
+                                    }
+
+                                    //设置未完成任务数 加一
+                                    self.setUnfinished(1, assign);
+
+                                } else { //修改
+                                    var origin = JSON.parse(localStorage.getItem("Index" + self.chosenAssign.getAttribute("data-assignIndex")));
+                                    if (origin.date > date) { //日期变小了
+                                        //从头开始遍历
+                                        self.addAssignment(parentNode.firstElementChild, date, self.chosenAssign);
+                                    } else if (origin.date < date) { //日期变大了
+                                        //从原来日期的下一个日期开始遍历
+                                        self.addAssignment(self.chosenAssign.nextElementSibling, date, self.chosenAssign);
+                                    }
+                                    self.chosenAssign.firstElementChild.innerHTML = title;
+                                    localStorage.setItem("Index" + self.chosenAssign.getAttribute("data-assignIndex"), JSON.stringify(obj));
+
+                                }
+
+                                self.getByClass("titleIcon")[0].classList.toggle("hide");
+                                self.getByClass("titleIcon")[1].classList.toggle("hide");
+                            } else {
+                                alert("Title and due date is a must!");
+                            }
+                        })();
+                        break;
                     default:
                         break;
                 }
@@ -172,50 +285,91 @@ var todo = {
 
         });
 
+        //完成编辑按钮 新增（chosenAssign为0）或修改（chosenAssign不为0）
+        // self.getById("glyphicon-ok").addEventListener("click", function () {
+        //     var date = self.getById("deadline").value,
+        //         title = self.getById("assTitle").value,
+        //         content = self.getById("assContent").value;
 
-        //编辑任务按钮
-        // self.getByClass("glyphicon-edit")[0].addEventListener("click", function () {
-        //     if (self.chosenAssign) { //选中了一个任务
-        //         //现有内容放入编辑框，可以编辑
-        //         var assignTitle = self.getById("assignTitle"),
+        //     if (title && date && content) { //任务标题、deadline、内容不为空
+        //         var parentNode = self.getByClass("middleItem")[0],
+        //             assignTitle = self.getById("assignTitle"),
         //             inputDate = self.getById("inputDate"),
-        //             contentContainer = self.getById("content");
-        //         assignTitle.innerHTML = "<input type='text' class='inputTitle' value=" + assignTitle.innerHTML + " id='assTitle'>";
-        //         inputDate.innerHTML = "<input type='date' name='deadline' id='deadline' value=" + inputDate.innerHTML + " >";
-        //         contentContainer.innerHTML = "<input type='text' class='inputContent' value=" + contentContainer.innerHTML + " id='assContent'>";
+        //             contentContainer = self.getById("content"),
+        //             added = false;
+        //         assignTitle.innerHTML = title;
+        //         inputDate.innerHTML = date;
+        //         contentContainer.innerHTML = content;
+        //         var obj = {
+        //             title: title,
+        //             date: date,
+        //             content: content
+        //         };
 
-        //         //右上按钮变为 取消编辑和完成编辑
+        //         if (self.chosenAssign === null) { //新增
+        //             //任务信息存到本地存储中（title,date,content）以index为索引项，status保存在DOM中
+        //             localStorage.setItem("Index" + self.assignIndex, JSON.stringify(obj)); //title
+        //             //点击提交任务后新任务默认显示在所有任务下（所有标签为选中状态）
+        //             self.setFilter(0);
+
+        //             //显示所有任务（显示该分类下所有任务）
+        //             self.showAllAssignment();
+        //             self.filterAssignment(null, self.chosenSubtitle.getAttribute("data-string"), 0, self.hide);
+
+
+        //             //更新存储日期
+        //             self.addItemToArr(date, "date");
+        //             self.addItemToArr(self.assignIndex + "", date);
+        //             localStorage.setItem(self.assignIndex + "main", self.chosenCategory.getAttribute("data-category"));
+        //             localStorage.setItem(self.assignIndex + "sub", self.chosenSubtitle.getAttribute("data-string"));
+        //             localStorage.setItem(self.assignIndex + "status", 1);
+
+        //             //新建一个任务，并将新增的任务设为选中任务
+        //             var assign = self.newAssignment(0, title);
+        //             self.chosenAssign = assign; //新增的任务成为选中任务
+
+        //             //任务新增在任务栏中
+        //             for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
+        //                 if (subDiv.getAttribute("data-deadline") > date) { //新增任务日期比所有已存在日期都小
+        //                     self.addAssignmentDOM(parentNode, subDiv, date, assign);
+        //                     added = true;
+        //                     break;
+        //                 } else if (subDiv.getAttribute("data-deadline") === date) { //已存在该日期分类
+        //                     break;
+        //                 }
+
+        //             }
+        //             if (!added) {
+        //                 if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
+        //                     subDiv.appendChild(assign);
+        //                 } else { //新增任务日期比所有已存在日期都大，添加到最末尾
+        //                     self.addAssignmentDOM(parentNode, subDiv, date, assign);
+        //                 }
+        //             }
+
+        //             //设置未完成任务数 加一
+        //             self.setUnfinished(1, assign);
+
+        //         } else { //修改
+        //             var origin = JSON.parse(localStorage.getItem("Index" + self.chosenAssign.getAttribute("data-assignIndex")));
+        //             if (origin.date > date) { //日期变小了
+        //                 //从头开始遍历
+        //                 self.addAssignment(parentNode.firstElementChild, date, self.chosenAssign);
+        //             } else if (origin.date < date) { //日期变大了
+        //                 //从原来日期的下一个日期开始遍历
+        //                 self.addAssignment(self.chosenAssign.nextElementSibling, date, self.chosenAssign);
+        //             }
+        //             self.chosenAssign.firstElementChild.innerHTML = title;
+        //             localStorage.setItem("Index" + self.chosenAssign.getAttribute("data-assignIndex"), JSON.stringify(obj));
+
+        //         }
+
         //         self.getByClass("titleIcon")[0].classList.toggle("hide");
         //         self.getByClass("titleIcon")[1].classList.toggle("hide");
         //     } else {
-        //         alert('Please choose an assignment first!');
+        //         alert("Title and due date is a must!");
         //     }
-
-        // });
-
-        // //取消编辑按钮
-        // self.getByClass("glyphicon-remove")[0].addEventListener("click", function () {
-        //     var index = self.chosenAssign,
-        //         assignTitle = self.getById("assignTitle"),
-        //         inputDate = self.getById("inputDate"),
-        //         contentContainer = self.getById("content");
-        //     if (index) { //非新建任务，显示chosenAssign的任务信息
-        //         var obj = JSON.parse(localStorage.getItem("Index" + index.getAttribute("data-assignIndex")));
-        //         assignTitle.innerHTML = obj.title;
-        //         inputDate.innerHTML = obj.date;
-        //         contentContainer.innerHTML = obj.content;
-        //     } else { //新建任务，右边信息清空
-        //         assignTitle.innerHTML = "";
-        //         inputDate.innerHTML = "";
-        //         contentContainer.innerHTML = "";
-        //     }
-
-        //     //右上按钮变为 完成和编辑按钮
-        //     self.getByClass("titleIcon")[0].classList.toggle("hide");
-        //     self.getByClass("titleIcon")[1].classList.toggle("hide");
-        // });
-
-
+        // }, false);
 
 
         //弹窗点击事件
@@ -273,93 +427,6 @@ var todo = {
 
 
 
-
-
-        //完成编辑按钮 新增（chosenAssign为0）或修改（chosenAssign不为0）
-        self.getById("glyphicon-ok").addEventListener("click", function () {
-            var date = self.getById("deadline").value,
-                title = self.getById("assTitle").value,
-                content = self.getById("assContent").value;
-
-            if (title && date && content) { //任务标题、deadline、内容不为空
-                var parentNode = self.getByClass("middleItem")[0],
-                    assignTitle = self.getById("assignTitle"),
-                    inputDate = self.getById("inputDate"),
-                    contentContainer = self.getById("content"),
-                    added = false;
-                assignTitle.innerHTML = title;
-                inputDate.innerHTML = date;
-                contentContainer.innerHTML = content;
-                var obj = {
-                    title: title,
-                    date: date,
-                    content: content
-                };
-
-                if (self.chosenAssign === null) { //新增
-                    //任务信息存到本地存储中（title,date,content）以index为索引项，status保存在DOM中
-                    localStorage.setItem("Index" + self.assignIndex, JSON.stringify(obj)); //title
-                    //点击提交任务后新任务默认显示在所有任务下（所有标签为选中状态）
-                    self.setFilter(0);
-
-                    //显示所有任务（显示该分类下所有任务）
-                    self.showAllAssignment();
-                    self.filterAssignment(null, self.chosenSubtitle.getAttribute("data-string"), 0, self.hide);
-
-
-                    //更新存储日期
-                    self.addItemToArr(date, "date");
-                    self.addItemToArr(self.assignIndex + "", date);
-                    localStorage.setItem(self.assignIndex + "main", self.chosenCategory.getAttribute("data-category"));
-                    localStorage.setItem(self.assignIndex + "sub", self.chosenSubtitle.getAttribute("data-string"));
-                    localStorage.setItem(self.assignIndex + "status", 1);
-
-                    //新建一个任务，并将新增的任务设为选中任务
-                    var assign = self.newAssignment(0, title);
-                    self.chosenAssign = assign; //新增的任务成为选中任务
-
-                    //任务新增在任务栏中
-                    for (var subDiv = parentNode.firstElementChild; subDiv; subDiv = subDiv.nextElementSibling) {
-                        if (subDiv.getAttribute("data-deadline") > date) { //新增任务日期比所有已存在日期都小
-                            self.addAssignmentDOM(parentNode, subDiv, date, assign);
-                            added = true;
-                            break;
-                        } else if (subDiv.getAttribute("data-deadline") === date) { //已存在该日期分类
-                            break;
-                        }
-
-                    }
-                    if (!added) {
-                        if (subDiv) { //已存在该日期分类，直接添加到该日期分类下
-                            subDiv.appendChild(assign);
-                        } else { //新增任务日期比所有已存在日期都大，添加到最末尾
-                            self.addAssignmentDOM(parentNode, subDiv, date, assign);
-                        }
-                    }
-
-                    //设置未完成任务数 加一
-                    self.setUnfinished(1, assign);
-
-                } else { //修改
-                    var origin = JSON.parse(localStorage.getItem("Index" + self.chosenAssign.getAttribute("data-assignIndex")));
-                    if (origin.date > date) { //日期变小了
-                        //从头开始遍历
-                        self.addAssignment(parentNode.firstElementChild, date, self.chosenAssign);
-                    } else if (origin.date < date) { //日期变大了
-                        //从原来日期的下一个日期开始遍历
-                        self.addAssignment(self.chosenAssign.nextElementSibling, date, self.chosenAssign);
-                    }
-                    self.chosenAssign.firstElementChild.innerHTML = title;
-                    localStorage.setItem("Index" + self.chosenAssign.getAttribute("data-assignIndex"), JSON.stringify(obj));
-
-                }
-
-                self.getByClass("titleIcon")[0].classList.toggle("hide");
-                self.getByClass("titleIcon")[1].classList.toggle("hide");
-            } else {
-                alert("Title and due date is a must!");
-            }
-        }, false);
 
         //-------------------------每个主分类、子分类被添加后都要再次添加，主分类、子分类是动态的------------------------//
         //显示及隐藏删除图标
@@ -484,7 +551,8 @@ var todo = {
                     let eachDate = JSON.parse(localStorage.getItem(dateArr[i]));
                     for (let j = 0, len = eachDate.length; j < len; j++) {
                         let oneAssignment = JSON.parse(localStorage.getItem("Index" + eachDate[j])),
-                            assign = self.newAssignment2(0, oneAssignment.title, eachDate[j]);
+                            status = parseInt(localStorage.getItem(eachDate[j] + "status")) - 1,
+                            assign = self.newAssignment2(status, oneAssignment.title, eachDate[j]);
                         self.addAssignmentDOM(self.getByClass("middleItem")[0], null, dateArr[i], assign);
                     }
 
@@ -751,13 +819,19 @@ var todo = {
         return assign;
     },
     newAssignment2: function (status, title, assignIndex) {
-        //新建一个任务
+        //新建一个任务 用于初始化显示任务
         var self = this,
             assign = document.createElement("DIV");
         assign.classList.add("titleGroup");
         assign.setAttribute("data-status", status);
         assign.setAttribute("data-assignIndex", assignIndex);
-        assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
+        assign.innerHTML += "<span class='theTitle'>" + title + "</span>";
+        if (status === 1) {
+            assign.innerHTML +=
+                "<div class='float_right'>" +
+                "<span class='glyphicon glyphicon-ok'></span>" +
+                "</div>";
+        }
         return assign;
     },
     //新建任务

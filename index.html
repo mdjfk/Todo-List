@@ -48,12 +48,12 @@
             </div>
             <div class="middleArea">
                 <div class="statusBtn">
-                    <div class="filter">所有</div>
-                    <div class="filter">未完成</div>
-                    <div class="filter">已完成</div>
+                    <div class="filter" id="allBtn">所有</div>
+                    <div class="filter" id="unfinishedBtn">未完成</div>
+                    <div class="filter" id="finishedBtn">已完成</div>
                 </div>
                 <div class="middleItem">
-                    <div class="dateGroup" data-deadline="2019-11-12">
+                    <!-- <div class="dateGroup" data-deadline="2019-11-12">
                         <div class="dateBlock">
                             2019-11-12
                         </div>
@@ -61,7 +61,7 @@
                             <span class="theTitle">title2</span>
                             <div class="float_right"><span class="glyphicon glyphicon-ok"></span></div>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
 
@@ -75,12 +75,12 @@
                     <div id="assignTitle">
                     </div>
                     <div class="titleIcon">
-                        <span class="glyphicon glyphicon-check"></span>
-                        <span class="glyphicon glyphicon-edit"></span>
+                        <span class="glyphicon glyphicon-check" title="完成任务"></span>
+                        <span class="glyphicon glyphicon-edit" title="编辑任务"></span>
                     </div>
                     <div class="titleIcon hide">
-                        <span class="glyphicon glyphicon-remove"></span>
-                        <span class="glyphicon glyphicon-ok" id="glyphicon-ok"></span>
+                        <span class="glyphicon glyphicon-remove" title="取消编辑"></span>
+                        <span class="glyphicon glyphicon-ok" id="glyphicon-ok" title="完成编辑"></span>
                     </div>
                 </div>
                 <div class="rightTimeBar">
