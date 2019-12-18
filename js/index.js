@@ -27,26 +27,27 @@ var todo = {
 
                             //中栏显示该分类的任务
                             self.showAllAssignment();
-                            self.filterAssignment(null, target.getAttribute("data-string"), self.assignmentType, self.hide);
+                            self.filterAssignment(self.chosenCategory.getAttribute("data-category"), target.getAttribute("data-string"), self.assignmentType, self.hide);
 
                         })();
                         break;
                         //删除图标点击
                     case target.className.indexOf("trashIcon") != -1:
+                        let mainCatName = target.parentNode.parentNode.getAttribute("data-category");
                         if (target.parentNode.className.indexOf("mainCat") != -1) {
-                            self.filterAssignment(target.parentNode.parentNode.getAttribute("data-category"), null, self.assignmentType, self.delete, 1);
+                            self.filterAssignment(mainCatName, null, self.assignmentType, self.delete, 1);
                             //删除这个主分类，更新总未完成任务数
                             var numNode = self.getById("assignNum");
                             numNode.innerHTML = parseInt(numNode.innerHTML) - parseInt(target.previousElementSibling.innerHTML);
                             //存储localStorage
                             localStorage.setItem("totalUnfinished", numNode.innerHTML);
-                            localStorage.removeItem("unfinished" + target.parentNode.parentNode.getAttribute("data-category"));
-                            localStorage.removeItem(target.parentNode.parentNode.getAttribute("data-category"));
-                            self.removeItem(target.parentNode.parentNode.getAttribute("data-category"), "name");
+                            localStorage.removeItem("unfinished" + mainCatName);
+                            localStorage.removeItem(mainCatName);
+                            self.removeItem(mainCatName, "name");
 
                             let sub = target.parentNode.parentNode.querySelectorAll(".subCat");
                             for (let i = 0, len = sub.length; i < len; i++) {
-                                localStorage.removeItem("unfinished" + target.parentNode.parentNode.getAttribute("data-category") + sub[i].getAttribute("data-string"));
+                                localStorage.removeItem("unfinished" + mainCatName + sub[i].getAttribute("data-string"));
                             }
 
                             target.parentNode.parentNode.remove();
@@ -54,6 +55,15 @@ var todo = {
                             //显示所有任务：同点击所有任务的效果
                             self.setFilter(0);
                             self.showAllAssignment();
+
+                            //删除下拉列表中的该分类
+                            for (let thisOption = self.getById("subCat").firstElementChild.nextElementSibling; thisOption; thisOption = thisOption.nextElementSibling) {
+                                if (thisOption.value === mainCatName) {
+                                    thisOption.remove();
+                                    break;
+                                }
+
+                            }
 
                         } else if (target.parentNode.className.indexOf("subCat") != -1) {
                             self.filterAssignment(null, target.parentNode.getAttribute("data-string"), self.assignmentType, self.delete, 1);
@@ -360,9 +370,6 @@ var todo = {
 
         });
 
-
-
-
         //-------------------------每个主分类、子分类被添加后都要再次添加，主分类、子分类是动态的------------------------//
         //显示及隐藏删除图标
         function toggleShow(e) {
@@ -443,14 +450,6 @@ var todo = {
                 // arr_name = eval('(' + str + ')');
             }
             self.clearData();
-            // var sub = localStorage.getItem(arr_name[0]);
-            // if (sub) {
-            //     var sub_name = JSON.parse(sub);
-            //     for (let i = 0, len = sub_name.length; i < len; i++) {
-            //         new Category(sub_name[i], 0).addSub(self.getByClass("defaultCat")[0]);
-
-            //     }
-            // }
             for (let i = 0, len = arr_name.length; i < len; i++) {
                 let cat = new Category(arr_name[i], parseInt(localStorage.getItem("unfinished" + arr_name[i]) || 0)).addCat(0);
                 let sub = localStorage.getItem(arr_name[i]);
@@ -469,14 +468,19 @@ var todo = {
             var str = localStorage.getItem("date");
             if (str) {
                 var dateArr = JSON.parse(str).sort();
+                //建一个dateArr[i]日期的组，遍历eachDate，每个任务加入该组
                 for (let i = 0, len = dateArr.length; i < len; i++) {
-                    let eachDate = JSON.parse(localStorage.getItem(dateArr[i]));
-                    for (let j = 0, len = eachDate.length; j < len; j++) {
-                        let oneAssignment = JSON.parse(localStorage.getItem("Index" + eachDate[j])),
-                            status = parseInt(localStorage.getItem(eachDate[j] + "status")) - 1,
-                            assign = self.newAssignment2(status, oneAssignment.title, eachDate[j]);
-                        self.addAssignmentDOM(self.getByClass("middleItem")[0], null, dateArr[i], assign);
+                    let indexArr = JSON.parse(localStorage.getItem(dateArr[i])),
+                        dateGroup = self.createDateGroup(dateArr[i]);
+
+                    for (let j = 0, len = indexArr.length; j < len; j++) {
+                        let oneAssignment = JSON.parse(localStorage.getItem("Index" + indexArr[j])),
+                            status = parseInt(localStorage.getItem(indexArr[j] + "status")) - 1,
+                            assign = self.newAssignment2(status, oneAssignment.title, indexArr[j]);
+                        dateGroup.appendChild(assign);
+                        // self.addAssignmentDOM(self.getByClass("middleItem")[0], null, dateArr[i], assign);
                     }
+                    self.getByClass("middleItem")[0].appendChild(dateGroup);
 
                 }
             }
@@ -493,9 +497,6 @@ var todo = {
             return startPoint.getElementsByClassName(className);
         }
         return document.getElementsByClassName(className);
-    },
-    getByTag: function (tag) {
-        return document.getElementsByTagName(tag);
     },
     classAddListener: function (cls, eventType, func) {
         var self = this,
@@ -629,10 +630,10 @@ var todo = {
             // let assignments = node.querySelectorAll("titleGroup"),
             let assignments = self.getByClass("titleGroup", node),
                 assignmentNum = assignments.length,
-                hideCount = 0,
-                flag = 0;
+                hideCount = 0;
             for (let i = 0; i < assignmentNum; i++) {
-                let assignIndex = assignments[i].getAttribute("data-assignIndex");
+                let assignIndex = assignments[i].getAttribute("data-assignIndex"),
+                    flag = 0;
                 if (main) {
                     if (localStorage.getItem(assignIndex + "main") != main) {
                         flag = 1;
@@ -719,7 +720,7 @@ var todo = {
         //存储localStorage
         localStorage.setItem("totalUnfinished", numNode3.innerHTML);
     },
-    //增加任务的DOM操作 FIXME:每个任务添加都单独创建了一个日期组，导致相同日期任务没有合并
+    //增加任务的DOM操作
     addAssignmentDOM: function (parentNode, subDiv, date, assignment) {
         var fragment = document.createElement("DIV");
         fragment.classList.add("dateGroup");
@@ -728,16 +729,39 @@ var todo = {
         fragment.appendChild(assignment);
         parentNode.appendChild(fragment, subDiv);
     },
+    createDateGroup: function (date) {
+        var fragment = document.createElement("DIV");
+        fragment.classList.add("dateGroup");
+        fragment.setAttribute("data-deadline", date);
+        fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
+        return fragment;
+    },
+    //eg. classList can be "class1 class2 class3 ...."
+    //attributeList can be an object like:
+    // {
+    //     "attribute1":value,
+    //     "attribute2":value,
+    //     ......
+
+    // }
+    creatSpecificElement: function (tagName, classList, attributeList, innerHtml) {
+        var element = document.createElement(tagName);
+        element.className = classList;
+        for (const key in attributeList) {
+            element.setAttribute(key, attributeList[key]);
+        }
+        element.innerHTML = innerHtml;
+        return element;
+    },
     //新建一个任务
     newAssignment: function (status, title) {
-        //新建一个任务
         var self = this,
-            assign = document.createElement("DIV");
-        assign.classList.add("titleGroup");
-        assign.setAttribute("data-status", status);
-        assign.setAttribute("data-assignIndex", self.assignIndex++);
-        localStorage.setItem("assignIndex", self.assignIndex);
-        assign.innerHTML = "<span class='theTitle'>" + title + "</span>";
+            assign = self.creatSpecificElement("DIV", "titleGroup", {
+                    "data-status": status,
+                    "data-assignIndex": self.assignIndex
+                },
+                "<span class='theTitle'>" + title + "</span>");
+        localStorage.setItem("assignIndex", ++self.assignIndex);
         return assign;
     },
     newAssignment2: function (status, title, assignIndex) {
