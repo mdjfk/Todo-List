@@ -5,8 +5,9 @@ body {
 .topBar {
     height: 70px;
     width: 100%;
-    background-color: rgb(189, 166, 166);
-    border-bottom: 1px solid grey;
+    /* background-color: rgb(189, 166, 166); */
+    background-color: #547E8C;
+    /* border-bottom: 1px solid grey; */
 }
 
 .mainFrame {
@@ -20,26 +21,30 @@ body {
 .leftArea {
     width: 260px;
     height: 100%;
-    background-color: rgb(236, 223, 223);
+    /* background-color: rgb(236, 223, 223); */
+    background-color: #B2C5CC;
+    /* background-color: rgb(170, 193, 201); */
     flex: none;
     position: relative;
-    border-right: 1px solid grey;
+    /* border-right: 1px solid grey; */
 
 }
 
 .middleArea {
     width: 260px;
     height: 100%;
-    background-color: rgb(231, 185, 185);
+    /* background-color: rgb(231, 185, 185); */
+    background-color: #DBE6E8;
     flex: none;
     position: relative;
-    border-right: 1px solid grey;
+    /* border-right: 1px solid grey; */
 
 }
 
 .rightArea {
     height: 100%;
-    background-color: rgb(235, 225, 140);
+    /* background-color: rgb(235, 225, 140); */
+    background-color: #F4F8F7;
     position: relative;
     flex: 1;
 }
@@ -53,15 +58,24 @@ body {
     line-height: 40px;
     width: 100%;
     bottom: 0;
-    border-top: 1px solid grey;
-    background-color: rgb(207, 197, 197);
+    /* border-top: 1px solid grey; */
+    /* background-color: rgb(207, 197, 197); */
+    background-color: #DBE6E8;
     cursor: pointer;
+    color: rgb(75, 107, 117);
+}
+
+.addAssign {
+    /* background-color: rgb(139, 169, 179); */
+    background-color: rgb(189, 210, 216);
+    color: rgb(74, 107, 117);
 }
 
 .rightTitleBar {
     height: 50px;
-    background-color: rgb(207, 197, 197);
-    border-bottom: 1px solid grey;
+    /* background-color: rgb(207, 197, 197); */
+    background-color: #D1DFE2;
+    /* border-bottom: 1px solid grey; */
     font-size: 24px;
     line-height: 50px;
     padding-left: 15px;
@@ -71,7 +85,8 @@ body {
 
 .rightTimeBar {
     height: 40px;
-    background-color: rgb(207, 197, 197);
+    /* background-color: rgb(207, 197, 197); */
+    background-color: #E1EBEC;
     /* border-bottom: 1px solid grey; */
     line-height: 40px;
     padding-left: 15px;
@@ -79,11 +94,15 @@ body {
 }
 
 #content {
-    padding: 15px;
+    padding: 12px;
     line-height: 130%;
-    border-top: 1px solid grey;
+    /* border-top: 1px solid grey; */
     width: 100%;
-    position: relative;
+    top: 90px;
+    bottom: 0;
+    position: absolute;
+    display: flex;
+    word-break: break-all;
 }
 
 .leftItem {
@@ -115,7 +134,7 @@ body {
 
 .mainCat:hover,
 .subCat:hover {
-    background-color: #fff;
+    background-color: #ECF2F2;
 }
 
 .statusBtn {
@@ -127,8 +146,8 @@ body {
     line-height: 40px;
     width: 100%;
     top: 0;
-    background-color: rgb(207, 197, 197);
-    border-bottom: 1px solid grey;
+    /* background-color: rgb(207, 197, 197); */
+    background-color: rgb(189, 210, 216);
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -146,13 +165,12 @@ body {
 }
 
 .filter:hover {
-    border: 1px solid grey;
-    background-color: rgb(236, 228, 228);
+    /* background-color: rgb(236, 228, 228); */
+    background-color: #ECF2F2;
 }
 
 .filterBackground {
-    border: 1px solid grey;
-    background-color: rgb(236, 228, 228);
+    background-color: #ECF2F2;
 }
 
 .leftTop {
@@ -219,18 +237,26 @@ body {
 .inputTitle {
     height: 38px;
     width: 60px;
+    padding: 0 5px;
     font-size: 22px;
     font-weight: 400;
     width: 100%;
     background-color: transparent;
-
+    border: none;
+    outline-style: none;
 }
 
 .inputContent {
     height: 100%;
     /* width: 60px; */
     font-size: 20px;
-    width: 100%;
+    /* width: 96%; */
+    flex: auto;
+    /* position: absolute; */
+    background-color: transparent;
+    border: none;
+    outline-style: none;
+    /* bottom: 0; */
 }
 
 #assignTitle {
@@ -255,7 +281,8 @@ body {
     line-height: 36px;
     padding: 0 0 0 20px;
     /* color: brown; */
-    background-color: rgb(228, 205, 205);
+    /* background-color: rgb(228, 205, 205); */
+    background-color: rgb(157, 180, 189);
 }
 
 .titleGroup {
@@ -263,7 +290,8 @@ body {
     line-height: 34px;
     padding: 0 10px 0 20px;
     color: rgb(110, 29, 29);
-    background-color: rgb(255, 241, 241);
+    /* background-color: rgb(255, 241, 241); */
+    background-color: rgb(189, 210, 216);
     cursor: pointer;
 }
 
