@@ -5,9 +5,7 @@ body {
 .topBar {
     height: 70px;
     width: 100%;
-    /* background-color: rgb(189, 166, 166); */
     background-color: #547E8C;
-    /* border-bottom: 1px solid grey; */
 }
 
 .mainFrame {
@@ -21,29 +19,22 @@ body {
 .leftArea {
     width: 260px;
     height: 100%;
-    /* background-color: rgb(236, 223, 223); */
-    background-color: #B2C5CC;
-    /* background-color: rgb(170, 193, 201); */
+    background-color: #B0C4CB;
     flex: none;
     position: relative;
-    /* border-right: 1px solid grey; */
-
+    color: rgb(54, 78, 85);
 }
 
 .middleArea {
     width: 260px;
     height: 100%;
-    /* background-color: rgb(231, 185, 185); */
     background-color: #DBE6E8;
     flex: none;
     position: relative;
-    /* border-right: 1px solid grey; */
-
 }
 
 .rightArea {
     height: 100%;
-    /* background-color: rgb(235, 225, 140); */
     background-color: #F4F8F7;
     position: relative;
     flex: 1;
@@ -58,24 +49,19 @@ body {
     line-height: 40px;
     width: 100%;
     bottom: 0;
-    /* border-top: 1px solid grey; */
-    /* background-color: rgb(207, 197, 197); */
     background-color: #DBE6E8;
     cursor: pointer;
     color: rgb(75, 107, 117);
 }
 
 .addAssign {
-    /* background-color: rgb(139, 169, 179); */
     background-color: rgb(189, 210, 216);
     color: rgb(74, 107, 117);
 }
 
 .rightTitleBar {
     height: 50px;
-    /* background-color: rgb(207, 197, 197); */
     background-color: #D1DFE2;
-    /* border-bottom: 1px solid grey; */
     font-size: 24px;
     line-height: 50px;
     padding-left: 15px;
@@ -85,9 +71,7 @@ body {
 
 .rightTimeBar {
     height: 40px;
-    /* background-color: rgb(207, 197, 197); */
     background-color: #E1EBEC;
-    /* border-bottom: 1px solid grey; */
     line-height: 40px;
     padding-left: 15px;
     position: relative;
@@ -96,7 +80,6 @@ body {
 #content {
     padding: 12px;
     line-height: 130%;
-    /* border-top: 1px solid grey; */
     width: 100%;
     top: 90px;
     bottom: 0;
@@ -109,10 +92,6 @@ body {
     padding: 12px 0;
 }
 
-/* .category {
-    padding: 8px 15px;
-    cursor: pointer;
-} */
 .glyphicon {
     cursor: pointer;
 }
@@ -146,7 +125,6 @@ body {
     line-height: 40px;
     width: 100%;
     top: 0;
-    /* background-color: rgb(207, 197, 197); */
     background-color: rgb(189, 210, 216);
     display: flex;
     align-items: center;
@@ -162,10 +140,10 @@ body {
     line-height: 28px;
     border: 1px solid transparent;
     border-radius: 8px;
+    letter-spacing: 1px;
 }
 
 .filter:hover {
-    /* background-color: rgb(236, 228, 228); */
     background-color: #ECF2F2;
 }
 
@@ -185,14 +163,14 @@ body {
     position: absolute;
     width: 330px;
     height: 180px;
-    background-color: rgb(193, 237, 240);
-    border: 1px solid brown;
+    background-color: #B0C4CB;
     border-radius: 15px;
     left: 50%;
     top: 50%;
     margin-top: -100px;
     margin-left: -165px;
     display: none;
+    box-shadow: 10px 10px 5px #888888;
 }
 
 .popWindow div {
@@ -206,20 +184,12 @@ body {
     font-size: 20px;
 }
 
-.show {
-    display: inline;
-}
-
 .hide {
     display: none;
 }
 
 .chosen {
     background-color: #fff;
-}
-
-.unchosen {
-    background-color: transparent;
 }
 
 .titleIcon {
@@ -248,15 +218,11 @@ body {
 
 .inputContent {
     height: 100%;
-    /* width: 60px; */
     font-size: 20px;
-    /* width: 96%; */
     flex: auto;
-    /* position: absolute; */
     background-color: transparent;
     border: none;
     outline-style: none;
-    /* bottom: 0; */
 }
 
 #assignTitle {
@@ -269,7 +235,6 @@ body {
     background-color: transparent;
     border: none;
     height: 35px;
-
 }
 
 .middleItem {
@@ -280,8 +245,7 @@ body {
     height: 36px;
     line-height: 36px;
     padding: 0 0 0 20px;
-    /* color: brown; */
-    /* background-color: rgb(228, 205, 205); */
+    color: #ECF2F2;
     background-color: rgb(157, 180, 189);
 }
 
@@ -289,8 +253,7 @@ body {
     height: 34px;
     line-height: 34px;
     padding: 0 10px 0 20px;
-    color: rgb(110, 29, 29);
-    /* background-color: rgb(255, 241, 241); */
+    color: rgb(54, 78, 85);
     background-color: rgb(189, 210, 216);
     cursor: pointer;
 }
