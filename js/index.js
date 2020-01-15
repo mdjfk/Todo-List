@@ -33,8 +33,8 @@ var todo = {
                     enumerable: true,
                     writable: true,
                     value: function includes(valueToFind) {
-                        this.forEach(element => {
-                            if (element === valueToFind) {
+                        this.forEach(function (item) {
+                            if (item === valueToFind) {
                                 return true;
                             }
                         });
