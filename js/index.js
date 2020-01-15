@@ -768,7 +768,7 @@ var todo = {
     creatSpecificElement: function (tagName, classList, attributeList, innerHtml) {
         var element = document.createElement(tagName);
         element.className = classList;
-        for (const key in attributeList) {
+        for (let key in attributeList) {
             element.setAttribute(key, attributeList[key]);
         }
         element.innerHTML = innerHtml;
