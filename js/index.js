@@ -238,12 +238,14 @@ var todo = {
                                 //现有内容放入编辑框，可以编辑
                                 var assignTitle = self.getById("assignTitle"),
                                     inputDate = self.getById("inputDate"),
-                                    contentContainer = self.getById("content");
-                                console.log(contentContainer);
+                                    contentContainer = self.getById("content"),
+                                    contentContainerValue = contentContainer.innerHTML;
+                                console.log("contentContainer.innerHTML: " + contentContainer.innerHTML);
                                 assignTitle.innerHTML = "<input type='text' class='inputTitle' value=" + assignTitle.innerHTML + " id='assTitle'>";
                                 inputDate.innerHTML = "<input type='date' name='deadline' id='deadline' value=" + inputDate.innerHTML + " >";
-                                contentContainer.innerHTML = "<textarea class='inputContent' value=" + contentContainer.innerHTML + " id='assContent'></textarea>";
-
+                                contentContainer.innerHTML = "<textarea class='inputContent' id='assContent'></textarea>";
+                                self.getById('assContent').focus();
+                                self.getById('assContent').value = contentContainerValue;
                                 //右上按钮变为 取消编辑和完成编辑
                                 self.getByClass("titleIcon")[0].classList.toggle("hide");
                                 self.getByClass("titleIcon")[1].classList.toggle("hide");
@@ -807,12 +809,23 @@ var todo = {
 
     // }
     creatSpecificElement: function (tagName, classList, attributeList, innerHtml) {
-        var element = document.createElement(tagName);
-        element.className = classList;
-        for (let key in attributeList) {
-            element.setAttribute(key, attributeList[key]);
+        try {
+            var element = document.createElement(tagName);
+        } catch (error) {
+            console.log(error);
         }
-        element.innerHTML = innerHtml;
+
+        if (typeof classList != "undefined") {
+            element.className = classList;
+        }
+        if (typeof attributeList != "undefined") {
+            for (let key in attributeList) {
+                element.setAttribute(key, attributeList[key]);
+            }
+        }
+        if (typeof innerHtml != "undefined") {
+            element.innerHTML = innerHtml;
+        }
         return element;
     },
     //新建一个任务
