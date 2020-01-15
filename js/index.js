@@ -5,6 +5,25 @@ var todo = {
     assignIndex: parseInt(localStorage.getItem("assignIndex") || 1),
     assignmentType: 0,
     init: function () {
+        (function (arr) {
+            arr.forEach(function (item) {
+                if (item.hasOwnProperty('remove')) {
+                    return;
+                }
+                Object.defineProperty(item, 'remove', {
+                    configurable: true,
+                    enumerable: true,
+                    writable: true,
+                    value: function remove() {
+                        if (this.parentNode === null) {
+                            return;
+                        }
+                        this.parentNode.removeChild(this);
+                    }
+                });
+            });
+        })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
         var self = this;
         // localStorage.clear();
 
