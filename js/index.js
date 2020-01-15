@@ -23,6 +23,26 @@ var todo = {
                 });
             });
         })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+        (function (arr) {
+            arr.forEach(function (item) {
+                if (item.hasOwnProperty('includes')) {
+                    return;
+                }
+                Object.defineProperty(item, 'includes', {
+                    configurable: true,
+                    enumerable: true,
+                    writable: true,
+                    value: function includes(valueToFind) {
+                        this.forEach(element => {
+                            if (element === valueToFind) {
+                                return true;
+                            }
+                        });
+                        return false;
+                    }
+                });
+            });
+        })([Array.prototype]);
 
         var self = this;
         // localStorage.clear();
