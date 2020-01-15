@@ -23,6 +23,7 @@ var todo = {
                 });
             });
         })([Element.prototype, CharacterData.prototype, DocumentType.prototype]);
+
         (function (arr) {
             arr.forEach(function (item) {
                 if (item.hasOwnProperty('includes')) {
@@ -33,8 +34,8 @@ var todo = {
                     enumerable: true,
                     writable: true,
                     value: function includes(valueToFind) {
-                        this.forEach(function (item) {
-                            if (item === valueToFind) {
+                        this.forEach(function (element) {
+                            if (element === valueToFind) {
                                 return true;
                             }
                         });
@@ -238,6 +239,7 @@ var todo = {
                                 var assignTitle = self.getById("assignTitle"),
                                     inputDate = self.getById("inputDate"),
                                     contentContainer = self.getById("content");
+                                console.log(contentContainer);
                                 assignTitle.innerHTML = "<input type='text' class='inputTitle' value=" + assignTitle.innerHTML + " id='assTitle'>";
                                 inputDate.innerHTML = "<input type='date' name='deadline' id='deadline' value=" + inputDate.innerHTML + " >";
                                 contentContainer.innerHTML = "<textarea class='inputContent' value=" + contentContainer.innerHTML + " id='assContent'></textarea>";
@@ -357,7 +359,7 @@ var todo = {
                                 self.getByClass("titleIcon")[0].classList.toggle("hide");
                                 self.getByClass("titleIcon")[1].classList.toggle("hide");
                             } else {
-                                alert("Title and due date is a must!");
+                                alert("Input unfinished!");
                             }
                         })();
                         break;
