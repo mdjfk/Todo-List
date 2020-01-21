@@ -166,8 +166,8 @@ var todo = {
             var target = e.target;
             if (target.nodeType === 1) {
                 let subcat = self.chosenSubtitle ? self.chosenSubtitle.getAttribute("data-string") : null,
-                    maincat = self.chosenCategory ? self.chosenCategory.getAttribute("data-category") : null
-                type = 0;
+                    maincat = self.chosenCategory ? self.chosenCategory.getAttribute("data-category") : null,
+                    type = 0;
                 switch (true) {
                     //新增任务按钮
                     case target.id == "addAssign":
@@ -240,7 +240,6 @@ var todo = {
                                     inputDate = self.getById("inputDate"),
                                     contentContainer = self.getById("content"),
                                     contentContainerValue = contentContainer.innerHTML;
-                                console.log("contentContainer.innerHTML: " + contentContainer.innerHTML);
                                 assignTitle.innerHTML = "<input type='text' class='inputTitle' value=" + assignTitle.innerHTML + " id='assTitle'>";
                                 inputDate.innerHTML = "<input type='date' name='deadline' id='deadline' value=" + inputDate.innerHTML + " >";
                                 contentContainer.innerHTML = "<textarea class='inputContent' id='assContent'></textarea>";
@@ -620,7 +619,12 @@ var todo = {
         self.addItemToArr(newDate, "date");
         self.addItemToArr(changedNode.getAttribute("data-assignIndex"), newDate);
     },
-
+    /**
+     * @description: add an item to an arr
+     * @param {string} item
+     * @param {string} arrName
+     * @return:
+     */
     addItemToArr: function (item, arrName) {
         var str = localStorage.getItem(arrName);
         if (str) {
@@ -636,7 +640,12 @@ var todo = {
             localStorage.setItem(arrName, JSON.stringify(arr));
         }
     },
-
+    /**
+     * @description: remove an item from an arr
+     * @param {string} item
+     * @param {string} arrName
+     * @return:
+     */
     removeItem: function (item, arrName) {
         var str = localStorage.getItem(arrName);
         if (str) {
@@ -654,6 +663,11 @@ var todo = {
             alert("The arrName designated doesn't exist!");
         }
     },
+    /**
+     * @description:
+     * @param {type}
+     * @return:
+     */
     clearData: function () {
         var self = this;
         self.getById("subCat").innerHTML = "<option value='newCategory' selected>新建分类</option>";
@@ -678,6 +692,15 @@ var todo = {
     },
     //_delete(optional): delete node->1 otherwise don't designate this arg
     //点击分类：显示所有的任务，然后不符合选中条件的隐藏，删除分类：所有符合条件的要删除，所以这个筛选是反的
+    /**
+     * @description:
+     * @param {type} main
+     * @param {type} sub
+     * @param {type} status
+     * @param {type} func
+     * @param {type} _delete
+     * @return:
+     */
     filterAssignment: function (main, sub, status, func, _delete) {
         var self = this;
         self.traverseClassNode(["dateGroup"], function (node) {
@@ -749,6 +772,11 @@ var todo = {
         });
     },
     //中栏筛选type=0所有=1未完成=2已完成
+    /**
+     * @description:
+     * @param {type} type
+     * @return:
+     */
     setFilter: function (type) {
         var self = this,
             nodes = self.getByClass("filter"),
@@ -800,14 +828,15 @@ var todo = {
         fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
         return fragment;
     },
-    //eg. classList can be "class1 class2 class3 ...."
-    //attributeList can be an object like:
-    // {
-    //     "attribute1":value,
-    //     "attribute2":value,
-    //     ......
 
-    // }
+    /**
+     * @description: create an element
+     * @param {string} tagName
+     * @param {string} classList "class1 class2 class3 ...."
+     * @param {object} attributeList {"attribute1":value,"attribute2":value,.....}
+     * @param {string} innerHtml
+     * @return {element} element
+     */
     creatSpecificElement: function (tagName, classList, attributeList, innerHtml) {
         try {
             var element = document.createElement(tagName);
@@ -839,17 +868,23 @@ var todo = {
         localStorage.setItem("assignIndex", ++self.assignIndex);
         return assign;
     },
+    /**
+     * @description:
+     * @param {type} status
+     * @param {type} title
+     * @param {type} assignIndex
+     * @return:
+     */
     newAssignment2: function (status, title, assignIndex) {
         //新建一个任务 用于初始化显示任务
         var self = this,
-            assign = document.createElement("DIV");
-        assign.classList.add("titleGroup");
-        assign.setAttribute("data-status", status);
-        assign.setAttribute("data-assignIndex", assignIndex);
+            assign = self.creatSpecificElement("DIV", "titleGroup", {
+                "data-status": status,
+                "data-assignIndex": assignIndex
+            });
         assign.innerHTML += "<span class='theTitle'>" + title + "</span>";
         if (status === 1) {
-            assign.innerHTML +=
-                "<div class='float_right'>" +
+            assign.innerHTML += "<div class='float_right'>" +
                 "<span class='glyphicon glyphicon-ok'></span>" +
                 "</div>";
         }
