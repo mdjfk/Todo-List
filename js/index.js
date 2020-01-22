@@ -450,13 +450,11 @@ var todo = {
             addSub: function (node, addItem) {
                 //新建（不定义addItem）或初始化显示（addItem置零）
                 addItem = (typeof addItem === "undefined") ? 1 : addItem;
-                var self = this,
-                    div = document.createElement("DIV");
-                div.classList.add("subCat");
-                div.setAttribute("data-string", self.name);
-                div.innerHTML = "<span class='glyphicon glyphicon-file'></span>&nbsp; " + self.name + " （<span class='assignNum'>" + self.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>";
+                var self = todo,
+                    div = self.createSpecificElement("DIV", "subCat", {
+                        "data-string": this.name
+                    }, "<span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inSubCat hide'></span>");
                 node.appendChild(div);
-                // node.innerHTML += "<div class='subCat'><span class='glyphicon glyphicon-file'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）</div>";
 
                 //显示及隐藏删除图标
                 toggleTrashIcon(div);
@@ -469,13 +467,12 @@ var todo = {
             /** 添加主分类 */
             addCat: function (addItem) {
                 addItem = (typeof addItem === "undefined") ? 1 : addItem;
-                var cat = document.createElement("DIV");
-                cat.classList.add("category");
-                cat.setAttribute("data-category", this.name);
-                var mainCat = document.createElement("DIV");
-                mainCat.classList.add("mainCat");
+                var self = todo,
+                    cat = self.createSpecificElement("DIV", "category", {
+                        "data-category": this.name
+                    }),
+                    mainCat = self.createSpecificElement("DIV", "mainCat", null, "<span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inMainCat hide'></span>");
                 cat.appendChild(mainCat);
-                mainCat.innerHTML = "<span class='glyphicon glyphicon-folder-close'></span>&nbsp; " + this.name + " （<span class='assignNum'>" + this.num + "</span>）<span class='glyphicon glyphicon-trash trashIcon inMainCat hide'></span>";
                 self.getById("leftItem").appendChild(cat);
                 //新建的主分类添加到弹框的下拉框中
                 self.getById("subCat").innerHTML += "<option value='" + this.name + "'>" + this.name + "</option>";
@@ -582,10 +579,9 @@ var todo = {
         //任务新增在任务栏中
         for (var subDiv = startNode; subDiv; subDiv = subDiv.nextElementSibling) {
             if (subDiv.getAttribute("data-deadline") > newDate) { //新增任务日期比所有已存在日期都小
-                var fragment = document.createElement("DIV");
-                fragment.classList.add("dateGroup");
-                fragment.setAttribute("data-deadline", newDate);
-                fragment.innerHTML = "<div class ='dateBlock'>" + newDate + "</div>";
+                var fragment = self.createSpecificElement("DIV", "dateGroup", {
+                    "data-deadline": newDate
+                }, "<div class ='dateBlock'>" + newDate + "</div>");
                 parentNode.insertBefore(fragment, subDiv);
                 fragment.insertBefore(changedNode, null);
                 // added = true;
@@ -599,10 +595,9 @@ var todo = {
         }
         if (!subDiv) {
             //修改任务日期比所有已存在日期都大，添加到最末尾
-            var fragment = document.createElement("DIV");
-            fragment.classList.add("dateGroup");
-            fragment.setAttribute("data-deadline", newDate);
-            fragment.innerHTML = "<div class ='dateBlock'>" + newDate + "</div>";
+            var fragment = self.createSpecificElement("DIV", "dateGroup", {
+                "data-deadline": newDate
+            }, "<div class ='dateBlock'>" + newDate + "</div>");
             parentNode.insertBefore(fragment, subDiv);
             fragment.insertBefore(changedNode, null);
         }
@@ -771,10 +766,9 @@ var todo = {
 
         });
     },
-    //中栏筛选type=0所有=1未完成=2已完成
     /**
-     * @description:
-     * @param {type} type
+     * @description: 中栏筛选
+     * @param {number} type 0-所有 1-未完成 2-已完成
      * @return:
      */
     setFilter: function (type) {
@@ -814,18 +808,18 @@ var todo = {
     },
     //增加任务的DOM操作
     addAssignmentDOM: function (parentNode, subDiv, date, assignment) {
-        var fragment = document.createElement("DIV");
-        fragment.classList.add("dateGroup");
-        fragment.setAttribute("data-deadline", date);
-        fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
+        var self = this;
+        self.createSpecificElement("DIV", "dateGroup", {
+            "data-deadline": date
+        }, "<div class ='dateBlock'>" + date + "</div>");
         fragment.appendChild(assignment);
         parentNode.appendChild(fragment, subDiv);
     },
     createDateGroup: function (date) {
-        var fragment = document.createElement("DIV");
-        fragment.classList.add("dateGroup");
-        fragment.setAttribute("data-deadline", date);
-        fragment.innerHTML = "<div class ='dateBlock'>" + date + "</div>";
+        var self = this,
+            fragment = self.createSpecificElement("DIV", "dateGroup", {
+                "data-deadline": date
+            }, "<div class ='dateBlock'>" + date + "</div>");
         return fragment;
     },
 
@@ -837,22 +831,23 @@ var todo = {
      * @param {string} innerHtml
      * @return {element} element
      */
-    creatSpecificElement: function (tagName, classList, attributeList, innerHtml) {
+    createSpecificElement: function (tagName, classList, attributeList, innerHtml) {
         try {
             var element = document.createElement(tagName);
         } catch (error) {
             console.log(error);
+            return;
         }
 
-        if (typeof classList != "undefined") {
+        if (typeof classList != "undefined" && classList) {
             element.className = classList;
         }
-        if (typeof attributeList != "undefined") {
+        if (typeof attributeList != "undefined" && attributeList) {
             for (let key in attributeList) {
                 element.setAttribute(key, attributeList[key]);
             }
         }
-        if (typeof innerHtml != "undefined") {
+        if (typeof innerHtml != "undefined" && innerHtml) {
             element.innerHTML = innerHtml;
         }
         return element;
@@ -860,7 +855,7 @@ var todo = {
     //新建一个任务
     newAssignment: function (status, title) {
         var self = this,
-            assign = self.creatSpecificElement("DIV", "titleGroup", {
+            assign = self.createSpecificElement("DIV", "titleGroup", {
                     "data-status": status,
                     "data-assignIndex": self.assignIndex
                 },
@@ -878,7 +873,7 @@ var todo = {
     newAssignment2: function (status, title, assignIndex) {
         //新建一个任务 用于初始化显示任务
         var self = this,
-            assign = self.creatSpecificElement("DIV", "titleGroup", {
+            assign = self.createSpecificElement("DIV", "titleGroup", {
                 "data-status": status,
                 "data-assignIndex": assignIndex
             });
